@@ -76,19 +76,25 @@ if st.session_state.dark_mode:
         ===================================================== */
 
         .stApp {
-            background-color: #0e1117;
-            color: white;
+            background-color: #0e1117 !important;
+            color: #ffffff !important;
+        }
+
+        .main {
+            background-color: #0e1117 !important;
         }
 
         .stApp p,
         .stApp span,
         .stApp li,
-        .stApp label {
-            color: white;
+        .stApp label,
+        .stApp div,
+        .stApp small {
+            color: #ffffff !important;
         }
 
         h1, h2, h3, h4, h5, h6 {
-            color: white !important;
+            color: #ffffff !important;
         }
 
 
@@ -97,11 +103,11 @@ if st.session_state.dark_mode:
         ===================================================== */
 
         section[data-testid="stSidebar"] {
-            background-color: #161b22;
+            background-color: #161b22 !important;
         }
 
         section[data-testid="stSidebar"] * {
-            color: white !important;
+            color: #ffffff !important;
         }
 
 
@@ -112,7 +118,8 @@ if st.session_state.dark_mode:
         .dashboard-card,
         .agent-card,
         .info-card {
-            background-color: #161b22;
+            background-color: #161b22 !important;
+            color: #ffffff !important;
             border: 1px solid #30363d;
             border-radius: 15px;
             padding: 20px;
@@ -124,7 +131,11 @@ if st.session_state.dark_mode:
                 border-color 0.3s ease;
         }
 
-        /* ⭐ HOVER EFFECT */
+        .dashboard-card *,
+        .agent-card *,
+        .info-card * {
+            color: #ffffff !important;
+        }
 
         .dashboard-card:hover,
         .agent-card:hover,
@@ -140,7 +151,8 @@ if st.session_state.dark_mode:
         ===================================================== */
 
         [data-testid="stMetric"] {
-            background-color: #161b22;
+            background-color: #161b22 !important;
+            color: #ffffff !important;
             border: 1px solid #30363d;
             border-radius: 12px;
             padding: 15px;
@@ -149,6 +161,10 @@ if st.session_state.dark_mode:
                 transform 0.3s ease,
                 box-shadow 0.3s ease,
                 border-color 0.3s ease;
+        }
+
+        [data-testid="stMetric"] * {
+            color: #ffffff !important;
         }
 
         [data-testid="stMetric"]:hover {
@@ -160,24 +176,69 @@ if st.session_state.dark_mode:
         [data-testid="stMetricLabel"],
         [data-testid="stMetricValue"],
         [data-testid="stMetricDelta"] {
-            color: white !important;
+            color: #ffffff !important;
         }
 
 
         /* =====================================================
-           TEXT INPUTS
+           ALL INPUTS
         ===================================================== */
 
         input,
         textarea {
             background-color: #161b22 !important;
-            color: white !important;
+            color: #ffffff !important;
             border: 1px solid #484f58 !important;
         }
 
         input::placeholder,
         textarea::placeholder {
             color: #b1bac4 !important;
+            opacity: 1 !important;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #2ea043 !important;
+            color: #ffffff !important;
+        }
+
+
+        /* =====================================================
+           TEXT AREA - FOOD LOG
+        ===================================================== */
+
+        [data-testid="stTextArea"] {
+            color: #ffffff !important;
+        }
+
+        [data-testid="stTextArea"] * {
+            color: #ffffff !important;
+        }
+
+        [data-testid="stTextArea"] textarea {
+            background-color: #161b22 !important;
+            color: #ffffff !important;
+            caret-color: #ffffff !important;
+        }
+
+
+        /* =====================================================
+           TEXT INPUT
+        ===================================================== */
+
+        [data-testid="stTextInput"] {
+            color: #ffffff !important;
+        }
+
+        [data-testid="stTextInput"] * {
+            color: #ffffff !important;
+        }
+
+        [data-testid="stTextInput"] input {
+            background-color: #161b22 !important;
+            color: #ffffff !important;
+            caret-color: #ffffff !important;
         }
 
 
@@ -185,9 +246,17 @@ if st.session_state.dark_mode:
            NUMBER INPUT
         ===================================================== */
 
+        [data-testid="stNumberInput"] {
+            color: #ffffff !important;
+        }
+
+        [data-testid="stNumberInput"] * {
+            color: #ffffff !important;
+        }
+
         [data-testid="stNumberInput"] input {
             background-color: #161b22 !important;
-            color: white !important;
+            color: #ffffff !important;
         }
 
 
@@ -195,14 +264,26 @@ if st.session_state.dark_mode:
            SELECT BOX
         ===================================================== */
 
+        [data-testid="stSelectbox"] {
+            color: #ffffff !important;
+        }
+
+        [data-testid="stSelectbox"] * {
+            color: #ffffff !important;
+        }
+
+        div[data-baseweb="select"] {
+            color: #ffffff !important;
+        }
+
         div[data-baseweb="select"] > div {
             background-color: #161b22 !important;
-            color: white !important;
+            color: #ffffff !important;
             border-color: #484f58 !important;
         }
 
         div[data-baseweb="select"] span {
-            color: white !important;
+            color: #ffffff !important;
         }
 
 
@@ -212,26 +293,42 @@ if st.session_state.dark_mode:
 
         [role="listbox"] {
             background-color: #161b22 !important;
-            color: white !important;
+            color: #ffffff !important;
         }
 
         [role="option"] {
             background-color: #161b22 !important;
-            color: white !important;
+            color: #ffffff !important;
+        }
+
+        [role="option"] * {
+            color: #ffffff !important;
         }
 
         [role="option"]:hover {
             background-color: #30363d !important;
-            color: white !important;
+            color: #ffffff !important;
         }
 
 
         /* =====================================================
-           RADIO BUTTONS
+           RADIO BUTTONS - FOOD LOG
         ===================================================== */
 
+        [data-testid="stRadio"] {
+            color: #ffffff !important;
+        }
+
+        [data-testid="stRadio"] * {
+            color: #ffffff !important;
+        }
+
         [data-testid="stRadio"] label {
-            color: white !important;
+            color: #ffffff !important;
+        }
+
+        [data-testid="stRadio"] span {
+            color: #ffffff !important;
         }
 
 
@@ -239,8 +336,16 @@ if st.session_state.dark_mode:
            CHECKBOX
         ===================================================== */
 
+        [data-testid="stCheckbox"] {
+            color: #ffffff !important;
+        }
+
+        [data-testid="stCheckbox"] * {
+            color: #ffffff !important;
+        }
+
         [data-testid="stCheckbox"] label {
-            color: white !important;
+            color: #ffffff !important;
         }
 
 
@@ -248,12 +353,12 @@ if st.session_state.dark_mode:
            SLIDER
         ===================================================== */
 
-        [data-testid="stSlider"] label {
-            color: white !important;
+        [data-testid="stSlider"] {
+            color: #ffffff !important;
         }
 
-        [data-testid="stSlider"] div {
-            color: white !important;
+        [data-testid="stSlider"] * {
+            color: #ffffff !important;
         }
 
 
@@ -263,7 +368,7 @@ if st.session_state.dark_mode:
 
         .stButton > button {
             background-color: #238636 !important;
-            color: white !important;
+            color: #ffffff !important;
             border: none !important;
             border-radius: 8px !important;
 
@@ -273,11 +378,13 @@ if st.session_state.dark_mode:
                 background-color 0.2s ease;
         }
 
-        /* ⭐ BUTTON HOVER */
+        .stButton > button * {
+            color: #ffffff !important;
+        }
 
         .stButton > button:hover {
             background-color: #2ea043 !important;
-            color: white !important;
+            color: #ffffff !important;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(46, 160, 67, 0.35);
         }
@@ -289,14 +396,56 @@ if st.session_state.dark_mode:
 
         .stDownloadButton > button {
             background-color: #238636 !important;
-            color: white !important;
+            color: #ffffff !important;
             transition: all 0.2s ease;
+        }
+
+        .stDownloadButton > button * {
+            color: #ffffff !important;
         }
 
         .stDownloadButton > button:hover {
             background-color: #2ea043 !important;
-            color: white !important;
+            color: #ffffff !important;
             transform: translateY(-2px);
+        }
+
+
+        /* =====================================================
+           FILE UPLOADER
+        ===================================================== */
+
+        [data-testid="stFileUploader"] {
+            background-color: #161b22 !important;
+            color: #ffffff !important;
+            border-radius: 10px;
+        }
+
+        [data-testid="stFileUploader"] * {
+            color: #ffffff !important;
+        }
+
+        [data-testid="stFileUploader"] section {
+            background-color: #161b22 !important;
+            border-color: #484f58 !important;
+        }
+
+        [data-testid="stFileUploader"] button {
+            color: #ffffff !important;
+            background-color: #30363d !important;
+        }
+
+
+        /* =====================================================
+           INFO / SUCCESS / WARNING / ERROR
+        ===================================================== */
+
+        [data-testid="stAlert"] {
+            color: #ffffff !important;
+        }
+
+        [data-testid="stAlert"] * {
+            color: #ffffff !important;
         }
 
 
@@ -307,10 +456,15 @@ if st.session_state.dark_mode:
         details {
             background-color: #161b22 !important;
             border: 1px solid #30363d !important;
+            color: #ffffff !important;
+        }
+
+        details * {
+            color: #ffffff !important;
         }
 
         details summary {
-            color: white !important;
+            color: #ffffff !important;
         }
 
 
@@ -319,13 +473,11 @@ if st.session_state.dark_mode:
         ===================================================== */
 
         [data-testid="stMarkdownContainer"] {
-            color: white !important;
+            color: #ffffff !important;
         }
 
-        [data-testid="stMarkdownContainer"] p,
-        [data-testid="stMarkdownContainer"] li,
-        [data-testid="stMarkdownContainer"] span {
-            color: white !important;
+        [data-testid="stMarkdownContainer"] * {
+            color: #ffffff !important;
         }
 
 
@@ -335,29 +487,16 @@ if st.session_state.dark_mode:
 
         [data-testid="stDataFrame"] {
             background-color: #161b22 !important;
+            color: #ffffff !important;
         }
 
 
         /* =====================================================
-           ALERTS
+           DIVIDERS
         ===================================================== */
 
-        [data-testid="stAlert"] {
-            color: white !important;
-        }
-
-
-        /* =====================================================
-           FILE UPLOADER
-        ===================================================== */
-
-        [data-testid="stFileUploader"] {
-            background-color: #161b22 !important;
-            color: white !important;
-        }
-
-        [data-testid="stFileUploader"] * {
-            color: white !important;
+        hr {
+            border-color: #30363d !important;
         }
 
         </style>
@@ -404,8 +543,6 @@ else:
                 box-shadow 0.3s ease,
                 border-color 0.3s ease;
         }
-
-        /* ⭐ HOVER EFFECT */
 
         .dashboard-card:hover,
         .agent-card:hover,
