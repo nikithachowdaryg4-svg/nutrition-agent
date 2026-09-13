@@ -49,7 +49,109 @@ if "dark_mode" not in st.session_state:
 
 if "food_result" not in st.session_state:
     st.session_state.food_result = None
+# =========================================================
+# HEALTH ADVISORY
+# =========================================================
 
+elif page == "❤️ Health Advisory":
+
+    st.title("❤️ Health Advisory")
+
+    st.write(
+        "Get simple nutrition guidance based on your health needs."
+    )
+
+    condition = st.selectbox(
+        "What would you like nutrition guidance for?",
+        [
+            "Healthy",
+            "Diabetes",
+            "Heart Health",
+            "High Blood Pressure",
+            "Obesity",
+            "PCOS",
+            "High Cholesterol",
+            "Anemia",
+            "General"
+        ]
+    )
+
+    question = st.text_area(
+        "Tell us what you would like to know",
+        placeholder="Example: What foods should I include in my diet?"
+    )
+
+    if st.button("❤️ Get Health Advice"):
+
+        if not question.strip():
+
+            question = (
+                f"Give general nutrition guidance for {condition}"
+            )
+
+        try:
+
+            # =================================================
+            # FIX:
+            # HealthAdvisoryAgent.get_advice()
+            # accepts only ONE argument after self.
+            # =================================================
+
+            health_query = f"""
+Health condition: {condition}
+
+User question:
+{question}
+"""
+
+            result = health_agent.get_advice(
+                health_query
+            )
+
+            st.success(
+                "Health guidance generated."
+            )
+
+            # =================================================
+            # DISPLAY RESULT
+            # =================================================
+
+            if isinstance(result, dict):
+
+                for key, value in result.items():
+
+                    st.markdown(
+                        f"### {key.replace('_', ' ').title()}"
+                    )
+
+                    if isinstance(value, list):
+
+                        for item in value:
+                            st.write(f"• {item}")
+
+                    else:
+
+                        st.write(value)
+
+            else:
+
+                st.write(result)
+
+            # =================================================
+            # MEDICAL DISCLAIMER
+            # =================================================
+
+            st.info(
+                "⚠️ This information is for general educational "
+                "purposes and is not a substitute for professional "
+                "medical advice."
+            )
+
+        except Exception as e:
+
+            st.error(
+                f"Unable to generate health advice: {e}"
+            )
 
 # =========================================================
 # HELPER FUNCTIONS
