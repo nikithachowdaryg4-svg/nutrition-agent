@@ -1,0 +1,44 @@
+Food,Category,Serving,Calories,Protein,Carbohydrates,Fat,Fiber,Sugar
+Rice,Grains,100g,130,2.7,28.2,0.3,0.4,0.1
+Brown Rice,Grains,100g,123,2.7,25.6,1.0,1.6,0.2
+Oats,Grains,100g,389,16.9,66.3,6.9,10.6,0.9
+Roti,Grains,1 piece,120,3.5,18.0,3.5,2.0,1.0
+Chapati,Grains,1 piece,104,3.0,18.0,2.5,2.5,1.0
+Idli,Breakfast,2 pieces,120,4.0,24.0,0.5,1.0,1.0
+Dosa,Breakfast,1 piece,168,4.0,25.0,5.0,1.5,1.0
+Poha,Breakfast,100g,158,3.0,28.0,3.5,2.5,1.5
+Upma,Breakfast,100g,150,4.0,25.0,4.0,2.0,1.0
+Dal,Legumes,100g,116,9.0,20.0,0.4,7.9,1.8
+Chickpeas,Legumes,100g,164,8.9,27.4,2.6,7.6,4.8
+Rajma,Legumes,100g,127,8.7,22.8,0.5,6.4,0.3
+Green Gram,Legumes,100g,105,7.0,19.0,0.4,7.6,2.0
+Paneer,Dairy,100g,265,18.3,6.1,20.8,0.0,3.0
+Milk,Dairy,250ml,150,8.0,12.0,8.0,0.0,12.0
+Curd,Dairy,100g,61,3.5,4.7,3.3,0.0,4.7
+Greek Yogurt,Dairy,100g,59,10.0,3.6,0.4,0.0,3.2
+Egg,Protein,1 large,78,6.3,0.6,5.3,0.0,0.6
+Chicken,Protein,100g,165,31.0,0.0,3.6,0.0,0.0
+Fish,Protein,100g,206,22.0,0.0,12.0,0.0,0.0
+Tofu,Protein,100g,76,8.0,1.9,4.8,0.3,0.6
+Apple,Fruits,1 medium,95,0.5,25.0,0.3,4.4,19.0
+Banana,Fruits,1 medium,105,1.3,27.0,0.4,3.1,14.4
+Orange,Fruits,1 medium,62,1.2,15.4,0.2,3.1,12.2
+Mango,Fruits,100g,60,0.8,15.0,0.4,1.6,13.7
+Guava,Fruits,100g,68,2.6,14.3,1.0,5.4,8.9
+Carrot,Vegetables,100g,41,0.9,9.6,0.2,2.8,4.7
+Spinach,Vegetables,100g,23,2.9,3.6,0.4,2.2,0.4
+Broccoli,Vegetables,100g,34,2.8,6.6,0.4,2.6,1.7
+Tomato,Vegetables,100g,18,0.9,3.9,0.2,1.2,2.6
+Potato,Vegetables,100g,77,2.0,17.5,0.1,2.2,0.8
+Sweet Potato,Vegetables,100g,86,1.6,20.1,0.1,3.0,4.2
+Almonds,Nuts,30g,174,6.4,6.1,15.0,3.2,1.3
+Peanuts,Nuts,30g,170,7.7,4.8,14.7,2.4,1.4
+Walnuts,Nuts,30g,196,4.6,4.1,19.6,2.0,0.7
+Chia Seeds,Seeds,30g,146,5.0,12.7,9.2,10.3,0.0
+Flax Seeds,Seeds,30g,160,5.5,8.7,12.7,8.1,0.4
+Avocado,Fruits,100g,160,2.0,8.5,14.7,6.7,0.7
+Cucumber,Vegetables,100g,15,0.7,3.6,0.1,0.5,1.7
+Beetroot,Vegetables,100g,43,1.6,9.6,0.2,2.8,6.8
+Milkshake,Beverages,250ml,180,6.0,28.0,5.0,1.0,22.0
+Coconut Water,Beverages,250ml,46,2.0,9.0,0.5,2.6,6.3
+Green Tea,Beverages,250ml,2,0.2,0.3,0.0,0.0,0.0
