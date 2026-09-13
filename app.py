@@ -4,103 +4,13 @@ import plotly.express as px
 import sqlite3
 import os
 import hmac
+import re
+from html import escape, unescape
 
 from nutrition_agent import NutritionAgent
 from diet_agent import DietRecommendationAgent
 from health_agent import HealthAdvisoryAgent
 from food_log_agent import FoodLogAgent
-def render_value(value):
-    """
-    Render agent results without Streamlit's white JSON boxes.
-    Works with dictionaries, lists, numbers and text.
-    """
-
-    if isinstance(value, dict):
-
-        for key, sub_value in value.items():
-
-            title = str(key).replace("_", " ").title()
-
-            st.markdown(
-                f"""
-                <div class="result-card">
-                    <div class="result-title">{title}</div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-            render_value(sub_value)
-
-    elif isinstance(value, (list, tuple, set)):
-
-        for item in value:
-
-            st.markdown(
-                f"""
-                <div class="result-item">
-                    • {item}
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-    elif isinstance(value, (int, float)):
-
-        st.markdown(
-            f"""
-            <div class="result-value">
-                {value}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-    else:
-
-        text = str(value)
-
-        # Remove accidental HTML from agent output
-        import re
-        from html import unescape
-
-        text = unescape(text)
-
-        text = re.sub(
-            r"<li[^>]*>",
-            "• ",
-            text,
-            flags=re.IGNORECASE
-        )
-
-        text = re.sub(
-            r"</li>",
-            "<br>",
-            text,
-            flags=re.IGNORECASE
-        )
-
-        text = re.sub(
-            r"<br\s*/?>",
-            "<br>",
-            text,
-            flags=re.IGNORECASE
-        )
-
-        text = re.sub(
-            r"<[^>]+>",
-            "",
-            text
-        )
-
-        st.markdown(
-            f"""
-            <div class="result-value">
-                {text}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
 
 from database import (
     create_tables,
@@ -142,7 +52,225 @@ if "food_result" not in st.session_state:
 
 
 # =========================================================
-# DARK / LIGHT MODE
+# HELPER FUNCTIONS
+# =========================================================
+
+def clean_agent_text(value):
+    """
+    Clean accidental HTML/Markdown returned by an agent.
+    This prevents things like <li>, <div>, svg, etc.
+    from appearing in the UI.
+    """
+
+    if value is None:
+        return ""
+
+    text = unescape(str(value))
+
+    # Convert list HTML to readable bullets
+    text = re.sub(
+        r"<\s*li[^>]*>",
+        "• ",
+        text,
+        flags=re.IGNORECASE
+    )
+
+    text = re.sub(
+        r"<\s*/\s*li\s*>",
+        "\n",
+        text,
+        flags=re.IGNORECASE
+    )
+
+    # Convert line breaks
+    text = re.sub(
+        r"<\s*br\s*/?\s*>",
+        "\n",
+        text,
+        flags=re.IGNORECASE
+    )
+
+    # Remove common HTML containers
+    text = re.sub(
+        r"<\s*/?\s*(div|ul|ol|p|span|strong|b)[^>]*>",
+        "",
+        text,
+        flags=re.IGNORECASE
+    )
+
+    # Remove remaining HTML tags
+    text = re.sub(
+        r"<[^>]+>",
+        "",
+        text
+    )
+
+    # Remove accidental standalone svg text
+    text = re.sub(
+        r"^\s*svg\s*$",
+        "",
+        text,
+        flags=re.IGNORECASE | re.MULTILINE
+    )
+
+    return text.strip()
+
+
+def render_agent_value(value, level=0):
+    """
+    Safely render agent output.
+
+    IMPORTANT:
+    We do NOT use st.write() for dictionaries/lists because
+    Streamlit can render them as white JSON/tree boxes in
+    dark mode.
+    """
+
+    # -----------------------------------------------------
+    # DataFrame
+    # -----------------------------------------------------
+
+    if isinstance(value, pd.DataFrame):
+
+        st.dataframe(
+            value,
+            use_container_width=True
+        )
+
+        return
+
+
+    # -----------------------------------------------------
+    # Dictionary
+    # -----------------------------------------------------
+
+    if isinstance(value, dict):
+
+        for key, sub_value in value.items():
+
+            title = clean_agent_text(
+                str(key).replace("_", " ").title()
+            )
+
+            st.markdown(
+                f"""
+                <div class="result-card">
+                    <div class="result-title">
+                        {escape(title)}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            render_agent_value(
+                sub_value,
+                level + 1
+            )
+
+        return
+
+
+    # -----------------------------------------------------
+    # List / Tuple / Set
+    # -----------------------------------------------------
+
+    if isinstance(
+        value,
+        (list, tuple, set)
+    ):
+
+        for item in value:
+
+            if isinstance(item, dict):
+
+                render_agent_value(
+                    item,
+                    level + 1
+                )
+
+            elif isinstance(
+                item,
+                (list, tuple, set)
+            ):
+
+                render_agent_value(
+                    item,
+                    level + 1
+                )
+
+            else:
+
+                text = clean_agent_text(
+                    item
+                )
+
+                if text:
+
+                    st.markdown(
+                        f"""
+                        <div class="result-item">
+                            • {escape(text)}
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+        return
+
+
+    # -----------------------------------------------------
+    # Numbers
+    # -----------------------------------------------------
+
+    if isinstance(
+        value,
+        (int, float)
+    ) and not isinstance(
+        value,
+        bool
+    ):
+
+        st.markdown(
+            f"""
+            <div class="result-value">
+                {escape(str(value))}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        return
+
+
+    # -----------------------------------------------------
+    # Everything else
+    # -----------------------------------------------------
+
+    text = clean_agent_text(
+        value
+    )
+
+    if text:
+
+        # Preserve line breaks
+        safe_text = escape(text).replace(
+            "\n",
+            "<br>"
+        )
+
+        st.markdown(
+            f"""
+            <div class="result-value">
+                {safe_text}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+
+# =========================================================
+# SIDEBAR DARK MODE
 # =========================================================
 
 st.sidebar.markdown("## ⚙️ Settings")
@@ -176,16 +304,12 @@ if st.session_state.dark_mode:
             color: #ffffff !important;
         }
 
-        /* Normal text */
-
         .stApp p,
         .stApp li,
         .stApp label,
         .stApp small {
             color: #ffffff !important;
         }
-
-        /* Headings */
 
         h1,
         h2,
@@ -211,7 +335,7 @@ if st.session_state.dark_mode:
 
 
         /* =====================================================
-           CARDS
+           EXISTING CARDS
         ===================================================== */
 
         .dashboard-card,
@@ -234,6 +358,7 @@ if st.session_state.dark_mode:
                 border-color 0.3s ease;
         }
 
+
         .dashboard-card:hover,
         .agent-card:hover,
         .info-card:hover {
@@ -247,12 +372,104 @@ if st.session_state.dark_mode:
         }
 
 
-        /* Card text */
-
         .dashboard-card *,
         .agent-card *,
         .info-card * {
             color: #ffffff !important;
+        }
+
+
+        /* =====================================================
+           RESULT CARDS
+        ===================================================== */
+
+        .result-card {
+
+            background-color: #161b22 !important;
+
+            border: 1px solid #30363d !important;
+
+            border-radius: 12px;
+
+            padding: 12px 16px;
+
+            margin-top: 10px;
+
+            margin-bottom: 6px;
+
+            transition:
+                transform 0.3s ease,
+                box-shadow 0.3s ease,
+                border-color 0.3s ease;
+        }
+
+
+        .result-card:hover {
+
+            transform: translateY(-4px);
+
+            box-shadow:
+                0 8px 20px rgba(0, 0, 0, 0.30);
+
+            border-color: #2ea043 !important;
+        }
+
+
+        .result-title {
+
+            color: #ffffff !important;
+
+            font-size: 18px;
+
+            font-weight: 600;
+        }
+
+
+        .result-value {
+
+            background-color: #161b22 !important;
+
+            color: #ffffff !important;
+
+            border: 1px solid #30363d !important;
+
+            border-radius: 10px;
+
+            padding: 12px 16px;
+
+            margin: 5px 0 12px 0;
+
+            line-height: 1.6;
+
+            word-wrap: break-word;
+        }
+
+
+        .result-item {
+
+            background-color: #161b22 !important;
+
+            color: #ffffff !important;
+
+            border: 1px solid #30363d !important;
+
+            border-radius: 10px;
+
+            padding: 10px 15px;
+
+            margin: 5px 0;
+
+            transition:
+                transform 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+
+        .result-item:hover {
+
+            transform: translateX(4px);
+
+            border-color: #2ea043 !important;
         }
 
 
@@ -276,6 +493,7 @@ if st.session_state.dark_mode:
                 border-color 0.3s ease;
         }
 
+
         [data-testid="stMetric"]:hover {
 
             transform: translateY(-5px);
@@ -286,9 +504,11 @@ if st.session_state.dark_mode:
             border-color: #2ea043 !important;
         }
 
+
         [data-testid="stMetricLabel"],
         [data-testid="stMetricValue"],
         [data-testid="stMetricDelta"] {
+
             color: #ffffff !important;
         }
 
@@ -307,23 +527,13 @@ if st.session_state.dark_mode:
             border: 1px solid #484f58 !important;
         }
 
+
         input::placeholder,
         textarea::placeholder {
 
             color: #b1bac4 !important;
+
             opacity: 1 !important;
-        }
-
-
-        /* =====================================================
-           NUMBER INPUT
-        ===================================================== */
-
-        [data-testid="stNumberInput"] input {
-
-            background-color: #161b22 !important;
-
-            color: #ffffff !important;
         }
 
 
@@ -340,10 +550,12 @@ if st.session_state.dark_mode:
             border-color: #484f58 !important;
         }
 
+
         div[data-baseweb="select"] span {
 
             color: #ffffff !important;
         }
+
 
         div[data-baseweb="select"] input {
 
@@ -362,12 +574,14 @@ if st.session_state.dark_mode:
             color: #ffffff !important;
         }
 
+
         [role="option"] {
 
             background-color: #161b22 !important;
 
             color: #ffffff !important;
         }
+
 
         [role="option"]:hover {
 
@@ -378,14 +592,10 @@ if st.session_state.dark_mode:
 
 
         /* =====================================================
-           RADIO BUTTONS
+           RADIO
         ===================================================== */
 
-        [data-testid="stRadio"] label {
-
-            color: #ffffff !important;
-        }
-
+        [data-testid="stRadio"] label,
         [data-testid="stRadio"] p {
 
             color: #ffffff !important;
@@ -432,6 +642,7 @@ if st.session_state.dark_mode:
                 background-color 0.2s ease;
         }
 
+
         .stButton > button:hover {
 
             background-color: #2ea043 !important;
@@ -458,6 +669,7 @@ if st.session_state.dark_mode:
             transition: all 0.2s ease;
         }
 
+
         .stDownloadButton > button:hover {
 
             background-color: #2ea043 !important;
@@ -469,7 +681,7 @@ if st.session_state.dark_mode:
 
 
         /* =====================================================
-           EXPANDER
+           EXPANDERS
         ===================================================== */
 
         details {
@@ -478,6 +690,7 @@ if st.session_state.dark_mode:
 
             border: 1px solid #30363d !important;
         }
+
 
         details summary {
 
@@ -494,38 +707,13 @@ if st.session_state.dark_mode:
             color: #ffffff !important;
         }
 
+
         [data-testid="stMarkdownContainer"] p,
         [data-testid="stMarkdownContainer"] li,
         [data-testid="stMarkdownContainer"] span,
         [data-testid="stMarkdownContainer"] strong {
 
             color: #ffffff !important;
-        }
-
-
-        /* =====================================================
-           FOOD RESULT
-        ===================================================== */
-
-        .food-result-value {
-
-            color: #ffffff !important;
-
-            background-color: #161b22 !important;
-
-            padding: 8px;
-
-            border-radius: 8px;
-        }
-
-
-        /* =====================================================
-           TABLE
-        ===================================================== */
-
-        [data-testid="stDataFrame"] {
-
-            background-color: #161b22 !important;
         }
 
 
@@ -537,6 +725,7 @@ if st.session_state.dark_mode:
 
             color: #ffffff !important;
         }
+
 
         [data-testid="stAlert"] * {
 
@@ -555,6 +744,7 @@ if st.session_state.dark_mode:
             color: #ffffff !important;
         }
 
+
         [data-testid="stFileUploader"] * {
 
             color: #ffffff !important;
@@ -562,11 +752,15 @@ if st.session_state.dark_mode:
 
 
         /* =====================================================
-           FORM / INPUT CONTAINERS
+           REMOVE WHITE JSON / CODE BACKGROUNDS
         ===================================================== */
 
-        [data-testid="stTextInput"] *,
-        [data-testid="stTextArea"] * {
+        [data-testid="stJson"],
+        [data-testid="stJson"] *,
+        pre,
+        code {
+
+            background-color: #161b22 !important;
 
             color: #ffffff !important;
         }
@@ -595,6 +789,7 @@ else:
             color: #222222;
         }
 
+
         h1,
         h2,
         h3,
@@ -607,7 +802,7 @@ else:
 
 
         /* =====================================================
-           CARDS
+           EXISTING CARDS
         ===================================================== */
 
         .dashboard-card,
@@ -630,6 +825,7 @@ else:
                 border-color 0.3s ease;
         }
 
+
         .dashboard-card:hover,
         .agent-card:hover,
         .info-card:hover {
@@ -638,6 +834,100 @@ else:
 
             box-shadow:
                 0 10px 25px rgba(0, 0, 0, 0.15);
+
+            border-color: #2ea043;
+        }
+
+
+        /* =====================================================
+           RESULT CARDS
+        ===================================================== */
+
+        .result-card {
+
+            background-color: #f8f9fa;
+
+            border: 1px solid #dddddd;
+
+            border-radius: 12px;
+
+            padding: 12px 16px;
+
+            margin-top: 10px;
+
+            margin-bottom: 6px;
+
+            transition:
+                transform 0.3s ease,
+                box-shadow 0.3s ease,
+                border-color 0.3s ease;
+        }
+
+
+        .result-card:hover {
+
+            transform: translateY(-4px);
+
+            box-shadow:
+                0 8px 20px rgba(0, 0, 0, 0.12);
+
+            border-color: #2ea043;
+        }
+
+
+        .result-title {
+
+            color: #222222;
+
+            font-size: 18px;
+
+            font-weight: 600;
+        }
+
+
+        .result-value {
+
+            background-color: #ffffff;
+
+            color: #222222;
+
+            border: 1px solid #dddddd;
+
+            border-radius: 10px;
+
+            padding: 12px 16px;
+
+            margin: 5px 0 12px 0;
+
+            line-height: 1.6;
+
+            word-wrap: break-word;
+        }
+
+
+        .result-item {
+
+            background-color: #ffffff;
+
+            color: #222222;
+
+            border: 1px solid #dddddd;
+
+            border-radius: 10px;
+
+            padding: 10px 15px;
+
+            margin: 5px 0;
+
+            transition:
+                transform 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+
+        .result-item:hover {
+
+            transform: translateX(4px);
 
             border-color: #2ea043;
         }
@@ -654,6 +944,7 @@ else:
                 box-shadow 0.3s ease,
                 border-color 0.3s ease;
         }
+
 
         [data-testid="stMetric"]:hover {
 
@@ -680,6 +971,7 @@ else:
                 background-color 0.2s ease;
         }
 
+
         .stButton > button:hover {
 
             transform: translateY(-2px);
@@ -698,6 +990,7 @@ else:
             transition: all 0.2s ease;
         }
 
+
         .stDownloadButton > button:hover {
 
             transform: translateY(-2px);
@@ -706,6 +999,7 @@ else:
                 0 5px 15px rgba(0, 0, 0, 0.15);
         }
 
+
         </style>
         """,
         unsafe_allow_html=True
@@ -713,7 +1007,7 @@ else:
 
 
 # =========================================================
-# INITIALIZE AGENTS
+# LOAD AI AGENTS
 # =========================================================
 
 @st.cache_resource
@@ -774,6 +1068,7 @@ if page == "🏠 Dashboard":
         "Intelligent Multi-Agent Nutrition Assistant"
     )
 
+
     st.markdown(
         """
         <div class="dashboard-card">
@@ -793,12 +1088,14 @@ if page == "🏠 Dashboard":
 
     col1, col2, col3, col4 = st.columns(4)
 
+
     with col1:
 
         st.metric(
             "🔎 Nutrition",
             "Search"
         )
+
 
     with col2:
 
@@ -807,12 +1104,14 @@ if page == "🏠 Dashboard":
             "Personalized"
         )
 
+
     with col3:
 
         st.metric(
             "📝 Food Log",
             "Track"
         )
+
 
     with col4:
 
@@ -826,6 +1125,7 @@ if page == "🏠 Dashboard":
 
     st.markdown("### 🤖 Our AI Agents")
 
+
     c1, c2 = st.columns(2)
 
 
@@ -838,9 +1138,8 @@ if page == "🏠 Dashboard":
             <h3>🔎 Nutrition Agent</h3>
 
             <p>
-            Search food information and understand
-            calories, protein, carbohydrates, fats,
-            vitamins and minerals.
+            Search food information and understand calories,
+            protein, carbohydrates, fats, vitamins and minerals.
             </p>
 
             </div>
@@ -856,9 +1155,8 @@ if page == "🏠 Dashboard":
             <h3>🍽️ Diet Recommendation Agent</h3>
 
             <p>
-            Creates a personalized nutrition plan
-            based on your body details, activity level
-            and goals.
+            Creates a personalized nutrition plan based on
+            your body details, activity level and goals.
             </p>
 
             </div>
@@ -876,8 +1174,7 @@ if page == "🏠 Dashboard":
             <h3>📝 Food Log Agent</h3>
 
             <p>
-            Record your meals and track your
-            nutrition history.
+            Record your meals and track your nutrition history.
             </p>
 
             </div>
@@ -893,8 +1190,8 @@ if page == "🏠 Dashboard":
             <h3>❤️ Health Advisory Agent</h3>
 
             <p>
-            Get simple nutrition guidance for
-            common health conditions.
+            Get simple nutrition guidance for common health
+            conditions.
             </p>
 
             </div>
@@ -938,6 +1235,7 @@ elif page == "🔎 Nutrition Knowledge":
                     query
                 )
 
+
                 if result is None:
 
                     st.warning(
@@ -948,6 +1246,7 @@ elif page == "🔎 Nutrition Knowledge":
 
                     st.session_state.food_result = result
 
+
             except Exception as e:
 
                 st.error(
@@ -957,57 +1256,15 @@ elif page == "🔎 Nutrition Knowledge":
 
     if st.session_state.food_result is not None:
 
-        result = st.session_state.food_result
-
         st.markdown("---")
 
         st.subheader(
             "🥗 Nutrition Information"
         )
 
-
-        if isinstance(result, pd.DataFrame):
-
-            st.dataframe(
-                result,
-                use_container_width=True
-            )
-
-
-        elif isinstance(result, dict):
-
-            for key, value in result.items():
-
-                st.markdown(
-                    f"""
-                    <div class="info-card">
-
-                    <strong>{key.replace('_', ' ').title()}</strong>
-
-                    <div class="food-result-value">
-                    {value}
-                    </div>
-
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-
-
-        else:
-
-            st.markdown(
-                f"""
-                <div class="info-card">
-
-                <div class="food-result-value">
-                {result}
-                </div>
-
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+        render_agent_value(
+            st.session_state.food_result
+        )
 
 
 # =========================================================
@@ -1160,8 +1417,10 @@ elif page == "🍽️ Diet Recommendation":
             )
 
 
-            if isinstance(result, dict):
-
+            if isinstance(
+                result,
+                dict
+            ):
 
                 # =================================================
                 # BMI
@@ -1266,46 +1525,9 @@ elif page == "🍽️ Diet Recommendation":
                         "🍱 Meal Plan"
                     )
 
-
-                    meal_plan = result[
-                        "meal_plan"
-                    ]
-
-
-                    if isinstance(
-                        meal_plan,
-                        dict
-                    ):
-
-                        for meal, foods in meal_plan.items():
-
-                            st.markdown(
-                                f"### 🍴 {meal}"
-                            )
-
-
-                            if isinstance(
-                                foods,
-                                list
-                            ):
-
-                                for food in foods:
-
-                                    st.write(
-                                        f"• {food}"
-                                    )
-
-                            else:
-
-                                st.write(
-                                    foods
-                                )
-
-                    else:
-
-                        st.write(
-                            meal_plan
-                        )
+                    render_agent_value(
+                        result["meal_plan"]
+                    )
 
 
                 # =================================================
@@ -1318,7 +1540,7 @@ elif page == "🍽️ Diet Recommendation":
                         "❤️ Health Advice"
                     )
 
-                    st.write(
+                    render_agent_value(
                         result["health_advice"]
                     )
 
@@ -1360,22 +1582,31 @@ elif page == "🍽️ Diet Recommendation":
 
                 for key, value in result.items():
 
-                    if key not in excluded_keys:
+                    if (
+                        key not in excluded_keys
+                        and value is not None
+                        and value != ""
+                    ):
 
-                        if value:
+                        title = key.replace(
+                            "_",
+                            " "
+                        ).title()
 
-                            st.markdown(
-                                f"### {key.replace('_', ' ').title()}"
-                            )
 
-                            st.write(
-                                value
-                            )
+                        st.markdown(
+                            f"### {title}"
+                        )
+
+
+                        render_agent_value(
+                            value
+                        )
 
 
             else:
 
-                st.write(
+                render_agent_value(
                     result
                 )
 
@@ -1417,7 +1648,7 @@ elif page == "📝 Food Log":
 
 
     # =====================================================
-    # TEXT
+    # TEXT INPUT
     # =====================================================
 
     if input_type == "⌨️ Text":
@@ -1431,7 +1662,7 @@ elif page == "📝 Food Log":
 
 
     # =====================================================
-    # IMAGE
+    # IMAGE INPUT
     # =====================================================
 
     elif input_type == "🖼️ Image":
@@ -1461,7 +1692,7 @@ elif page == "📝 Food Log":
 
 
     # =====================================================
-    # VOICE
+    # VOICE INPUT
     # =====================================================
 
     else:
@@ -1507,41 +1738,13 @@ elif page == "📝 Food Log":
                 )
 
 
-                if isinstance(
-                    result,
-                    dict
-                ):
+                # IMPORTANT:
+                # Use render_agent_value instead of st.write()
+                # so dictionaries/lists don't become white JSON boxes.
 
-                    for key, value in result.items():
-
-                        st.markdown(
-                            f"### {key.replace('_', ' ').title()}"
-                        )
-
-
-                        if isinstance(
-                            value,
-                            list
-                        ):
-
-                            for item in value:
-
-                                st.write(
-                                    f"• {item}"
-                                )
-
-                        else:
-
-                            st.write(
-                                value
-                            )
-
-
-                else:
-
-                    st.write(
-                        result
-                    )
+                render_agent_value(
+                    result
+                )
 
 
             except Exception as e:
@@ -1707,13 +1910,10 @@ elif page == "❤️ Health Advisory":
         try:
 
             # =================================================
-            # IMPORTANT FIX
+            # HEALTH AGENT FIX
             #
-            # HealthAdvisoryAgent.get_advice()
-            # accepts ONE argument after self.
-            #
-            # Therefore condition + question are combined
-            # into one prompt.
+            # get_advice() accepts ONE argument after self.
+            # Condition + question are combined into one prompt.
             # =================================================
 
             health_query = f"""
@@ -1722,9 +1922,10 @@ Health condition: {condition}
 User question:
 {question}
 
-Please provide clear, practical nutrition guidance.
-Mention important foods to include or limit where appropriate.
-Keep the advice easy to understand.
+Please provide clear and practical nutrition guidance.
+Explain foods that may be helpful and foods that may need
+to be limited where appropriate.
+Keep the response easy to understand.
 """
 
 
@@ -1738,50 +1939,10 @@ Keep the advice easy to understand.
             )
 
 
-            # =================================================
-            # DISPLAY RESULT
-            # =================================================
+            render_agent_value(
+                result
+            )
 
-            if isinstance(
-                result,
-                dict
-            ):
-
-                for key, value in result.items():
-
-                    st.markdown(
-                        f"### {key.replace('_', ' ').title()}"
-                    )
-
-
-                    if isinstance(
-                        value,
-                        list
-                    ):
-
-                        for item in value:
-
-                            st.write(
-                                f"• {item}"
-                            )
-
-                    else:
-
-                        st.write(
-                            value
-                        )
-
-
-            else:
-
-                st.write(
-                    result
-                )
-
-
-            # =================================================
-            # DISCLAIMER
-            # =================================================
 
             st.info(
                 "⚠️ This information is for general educational "
