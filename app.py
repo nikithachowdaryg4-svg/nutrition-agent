@@ -27,8 +27,7 @@ create_tables()
 # ==================================================
 # USER FEEDBACK DATABASE
 # ==================================================
-
-FEEDBACK_DB = "database/user_feedback.db"
+FEEDBACK_DB = "user_feedback.db"
 
 
 def create_feedback_table():
