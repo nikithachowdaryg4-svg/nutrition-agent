@@ -5,12 +5,12 @@ import sqlite3
 import os
 import hmac
 from nutrition_agent import NutritionAgent
-from nutrition_agent import NutritionAgent
-from diet_agent import DietRecommendationAgent
-from agents.health_agent import HealthAdvisoryAgent
-from agents.food_log_agent import FoodLogAgent
 
-from database.database import (
+from diet_agent import DietRecommendationAgent
+from health_agent import HealthAdvisoryAgent
+from food_log_agent import FoodLogAgent
+
+from database import (
     create_tables,
     save_meal,
     get_meal_logs
