@@ -1,4 +1,4 @@
-from utils.nutrition_calculator import (
+from nutrition_calculator import ( (
     calculate_bmi,
     bmi_category,
     calculate_bmr,
