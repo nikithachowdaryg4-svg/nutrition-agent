@@ -51,7 +51,7 @@ if "food_result" not in st.session_state:
 
 
 # =========================================================
-# DARK / LIGHT MODE
+# SIDEBAR SETTINGS
 # =========================================================
 
 st.sidebar.markdown("## ⚙️ Settings")
@@ -63,7 +63,7 @@ st.session_state.dark_mode = st.sidebar.toggle(
 
 
 # =========================================================
-# GLOBAL CSS
+# DARK MODE CSS
 # =========================================================
 
 if st.session_state.dark_mode:
@@ -89,21 +89,36 @@ if st.session_state.dark_mode:
             color: #ffffff !important;
         }
 
-        /* Main text */
+
+        /* =====================================================
+           TEXT
+        ===================================================== */
 
         .stApp p,
+        .stApp span,
         .stApp li,
         .stApp label,
-        .stApp h1,
-        .stApp h2,
-        .stApp h3,
-        .stApp h4,
-        .stApp h5,
-        .stApp h6 {
+        .stApp small {
             color: #ffffff !important;
         }
 
-        h1, h2, h3, h4, h5, h6 {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            color: #ffffff !important;
+        }
+
+        [data-testid="stMarkdownContainer"] {
+            color: #ffffff !important;
+        }
+
+        [data-testid="stMarkdownContainer"] p,
+        [data-testid="stMarkdownContainer"] li,
+        [data-testid="stMarkdownContainer"] span,
+        [data-testid="stMarkdownContainer"] strong {
             color: #ffffff !important;
         }
 
@@ -122,7 +137,7 @@ if st.session_state.dark_mode:
 
 
         /* =====================================================
-           DASHBOARD / AGENT CARDS
+           CARDS
         ===================================================== */
 
         .dashboard-card,
@@ -131,15 +146,13 @@ if st.session_state.dark_mode:
 
             background-color: #161b22 !important;
 
-            color: #ffffff !important;
-
             border: 1px solid #30363d !important;
 
-            border-radius: 15px !important;
+            border-radius: 15px;
 
-            padding: 20px !important;
+            padding: 20px;
 
-            margin-bottom: 15px !important;
+            margin-bottom: 15px;
 
             transition:
                 transform 0.3s ease,
@@ -147,11 +160,10 @@ if st.session_state.dark_mode:
                 border-color 0.3s ease;
         }
 
-        .dashboard-card *,
-        .agent-card *,
-        .info-card * {
-            color: #ffffff !important;
-        }
+
+        /* =====================================================
+           CARD HOVER EFFECT
+        ===================================================== */
 
         .dashboard-card:hover,
         .agent-card:hover,
@@ -174,13 +186,11 @@ if st.session_state.dark_mode:
 
             background-color: #161b22 !important;
 
-            color: #ffffff !important;
-
             border: 1px solid #30363d !important;
 
-            border-radius: 12px !important;
+            border-radius: 12px;
 
-            padding: 15px !important;
+            padding: 15px;
 
             transition:
                 transform 0.3s ease,
@@ -193,7 +203,7 @@ if st.session_state.dark_mode:
             transform: translateY(-5px);
 
             box-shadow:
-                0 8px 20px rgba(0, 0, 0, 0.30);
+                0 8px 20px rgba(0, 0, 0, 0.3);
 
             border-color: #2ea043 !important;
         }
@@ -201,10 +211,7 @@ if st.session_state.dark_mode:
         [data-testid="stMetricLabel"],
         [data-testid="stMetricValue"],
         [data-testid="stMetricDelta"] {
-
             color: #ffffff !important;
-
-            background: transparent !important;
         }
 
 
@@ -221,13 +228,21 @@ if st.session_state.dark_mode:
 
             border: 1px solid #484f58 !important;
 
-            border-radius: 8px !important;
+            caret-color: #ffffff !important;
         }
 
         input::placeholder,
         textarea::placeholder {
-
             color: #8b949e !important;
+        }
+
+        input:focus,
+        textarea:focus {
+
+            border-color: #2ea043 !important;
+
+            box-shadow:
+                0 0 0 1px #2ea043 !important;
         }
 
 
@@ -235,20 +250,11 @@ if st.session_state.dark_mode:
            NUMBER INPUT
         ===================================================== */
 
-        [data-testid="stNumberInput"] {
-
-            background-color: transparent !important;
-
-            color: #ffffff !important;
-        }
-
         [data-testid="stNumberInput"] input {
 
             background-color: #161b22 !important;
 
             color: #ffffff !important;
-
-            border: 1px solid #484f58 !important;
         }
 
 
@@ -256,24 +262,16 @@ if st.session_state.dark_mode:
            SELECT BOX
         ===================================================== */
 
-        div[data-baseweb="select"] {
-
-            background-color: #161b22 !important;
-
-            color: #ffffff !important;
-        }
-
         div[data-baseweb="select"] > div {
 
             background-color: #161b22 !important;
 
             color: #ffffff !important;
 
-            border: 1px solid #484f58 !important;
+            border-color: #484f58 !important;
         }
 
         div[data-baseweb="select"] span {
-
             color: #ffffff !important;
         }
 
@@ -307,12 +305,8 @@ if st.session_state.dark_mode:
 
 
         /* =====================================================
-           RADIO
+           RADIO BUTTONS
         ===================================================== */
-
-        [data-testid="stRadio"] {
-            color: #ffffff !important;
-        }
 
         [data-testid="stRadio"] label {
             color: #ffffff !important;
@@ -332,10 +326,7 @@ if st.session_state.dark_mode:
            SLIDER
         ===================================================== */
 
-        [data-testid="stSlider"] label {
-            color: #ffffff !important;
-        }
-
+        [data-testid="stSlider"] label,
         [data-testid="stSlider"] div {
             color: #ffffff !important;
         }
@@ -386,11 +377,7 @@ if st.session_state.dark_mode:
 
             border: none !important;
 
-            border-radius: 8px !important;
-
-            transition:
-                transform 0.2s ease,
-                box-shadow 0.2s ease;
+            transition: all 0.2s ease;
         }
 
         .stDownloadButton > button:hover {
@@ -400,161 +387,16 @@ if st.session_state.dark_mode:
             color: #ffffff !important;
 
             transform: translateY(-2px);
-
-            box-shadow:
-                0 5px 15px rgba(46, 160, 67, 0.35);
         }
 
 
         /* =====================================================
-           MARKDOWN
-        ===================================================== */
-
-        [data-testid="stMarkdownContainer"] {
-
-            color: #ffffff !important;
-
-            background-color: transparent !important;
-        }
-
-        [data-testid="stMarkdownContainer"] p,
-        [data-testid="stMarkdownContainer"] li,
-        [data-testid="stMarkdownContainer"] span,
-        [data-testid="stMarkdownContainer"] strong {
-
-            color: #ffffff !important;
-
-            background-color: transparent !important;
-        }
-
-
-        /* =====================================================
-           TEXT OUTPUT
-        ===================================================== */
-
-        [data-testid="stText"] {
-
-            color: #ffffff !important;
-
-            background-color: transparent !important;
-        }
-
-
-        /* =====================================================
-           FOOD LOG RESULT CARDS
-        ===================================================== */
-
-        .food-result-card {
-
-            background-color: #161b22 !important;
-
-            color: #ffffff !important;
-
-            border: 1px solid #30363d !important;
-
-            border-radius: 14px !important;
-
-            padding: 18px 20px !important;
-
-            margin: 10px 0 18px 0 !important;
-
-            transition:
-                transform 0.3s ease,
-                box-shadow 0.3s ease,
-                border-color 0.3s ease;
-        }
-
-        .food-result-card:hover {
-
-            transform: translateY(-4px);
-
-            box-shadow:
-                0 8px 20px rgba(0, 0, 0, 0.30);
-
-            border-color: #2ea043 !important;
-        }
-
-        .food-result-card h3 {
-
-            color: #ffffff !important;
-
-            margin-top: 0 !important;
-
-            margin-bottom: 12px !important;
-        }
-
-        .food-result-card p {
-
-            color: #ffffff !important;
-
-            margin: 5px 0 !important;
-        }
-
-        .food-result-card li {
-
-            color: #ffffff !important;
-
-            margin: 5px 0 !important;
-        }
-
-        .food-result-value {
-
-            color: #ffffff !important;
-
-            background-color: transparent !important;
-
-            font-size: 16px;
-        }
-
-
-        /* =====================================================
-           FOOD LIST
-        ===================================================== */
-
-        .food-list {
-
-            background-color: #161b22 !important;
-
-            border: 1px solid #30363d !important;
-
-            border-radius: 10px !important;
-
-            padding: 14px 20px !important;
-
-            margin-top: 8px !important;
-        }
-
-        .food-list li {
-
-            color: #ffffff !important;
-
-            margin: 6px 0 !important;
-        }
-
-
-        /* =====================================================
-           DATAFRAME
-        ===================================================== */
-
-        [data-testid="stDataFrame"] {
-
-            background-color: #161b22 !important;
-
-            color: #ffffff !important;
-
-            border-radius: 10px !important;
-        }
-
-
-        /* =====================================================
-           EXPANDER
+           EXPANDERS
         ===================================================== */
 
         details {
 
             background-color: #161b22 !important;
-
-            color: #ffffff !important;
 
             border: 1px solid #30363d !important;
 
@@ -570,16 +412,58 @@ if st.session_state.dark_mode:
 
 
         /* =====================================================
+           JSON / TREE COMPONENT
+           THIS FIXES THE WHITE BOXES IN FOOD LOG
+        ===================================================== */
+
+        [data-testid="stJson"] {
+
+            background-color: #161b22 !important;
+
+            color: #ffffff !important;
+
+            border: 1px solid #30363d !important;
+
+            border-radius: 10px !important;
+        }
+
+        [data-testid="stJson"] * {
+
+            background-color: #161b22 !important;
+
+            color: #ffffff !important;
+        }
+
+
+        /* =====================================================
+           CODE BLOCKS
+        ===================================================== */
+
+        pre,
+        code {
+
+            background-color: #161b22 !important;
+
+            color: #ffffff !important;
+
+            border: 1px solid #30363d !important;
+        }
+
+
+        /* =====================================================
            ALERTS
         ===================================================== */
 
         [data-testid="stAlert"] {
 
+            background-color: #161b22 !important;
+
             color: #ffffff !important;
+
+            border-radius: 10px !important;
         }
 
         [data-testid="stAlert"] * {
-
             color: #ffffff !important;
         }
 
@@ -594,32 +478,110 @@ if st.session_state.dark_mode:
 
             color: #ffffff !important;
 
+            border: 1px solid #30363d !important;
+
             border-radius: 10px !important;
         }
 
         [data-testid="stFileUploader"] * {
-
             color: #ffffff !important;
         }
 
+        [data-testid="stFileUploaderDropzone"] {
 
-        /* =====================================================
-           DIVIDERS
-        ===================================================== */
+            background-color: #161b22 !important;
 
-        hr {
-
-            border-color: #30363d !important;
+            border-color: #484f58 !important;
         }
 
 
         /* =====================================================
-           PLOTLY
+           DATAFRAME
         ===================================================== */
 
-        .js-plotly-plot {
+        [data-testid="stDataFrame"] {
 
             background-color: #161b22 !important;
+
+            border-radius: 10px !important;
+        }
+
+
+        /* =====================================================
+           FOOD RESULT CARDS
+        ===================================================== */
+
+        .food-result-card {
+
+            background-color: #161b22 !important;
+
+            border: 1px solid #30363d !important;
+
+            border-radius: 12px !important;
+
+            padding: 18px !important;
+
+            margin: 10px 0 !important;
+
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease,
+                border-color 0.25s ease;
+        }
+
+        .food-result-card:hover {
+
+            transform: translateY(-4px);
+
+            box-shadow:
+                0 8px 20px rgba(0, 0, 0, 0.30);
+
+            border-color: #2ea043 !important;
+        }
+
+        .food-result-title {
+
+            font-size: 20px;
+
+            font-weight: 700;
+
+            color: #ffffff !important;
+
+            margin-bottom: 8px;
+        }
+
+        .food-result-value {
+
+            font-size: 16px;
+
+            color: #ffffff !important;
+
+            line-height: 1.6;
+        }
+
+        .food-result-item {
+
+            background-color: #21262d !important;
+
+            color: #ffffff !important;
+
+            padding: 8px 12px;
+
+            border-radius: 8px;
+
+            margin: 5px 0;
+
+            border: 1px solid #30363d;
+        }
+
+
+        /* =====================================================
+           IMAGE
+        ===================================================== */
+
+        [data-testid="stImage"] img {
+
+            border-radius: 12px;
         }
 
         </style>
@@ -638,21 +600,12 @@ else:
         """
         <style>
 
-        /* =====================================================
-           MAIN
-        ===================================================== */
-
         .stApp {
 
             background-color: #ffffff !important;
 
             color: #222222 !important;
         }
-
-
-        /* =====================================================
-           HEADINGS
-        ===================================================== */
 
         h1,
         h2,
@@ -673,23 +626,26 @@ else:
         .agent-card,
         .info-card {
 
-            background-color: #f8f9fa !important;
+            background-color: #f8f9fa;
 
-            color: #222222 !important;
+            border: 1px solid #dddddd;
 
-            border: 1px solid #dddddd !important;
+            border-radius: 15px;
 
-            border-radius: 15px !important;
+            padding: 20px;
 
-            padding: 20px !important;
-
-            margin-bottom: 15px !important;
+            margin-bottom: 15px;
 
             transition:
                 transform 0.3s ease,
                 box-shadow 0.3s ease,
                 border-color 0.3s ease;
         }
+
+
+        /* =====================================================
+           HOVER EFFECT
+        ===================================================== */
 
         .dashboard-card:hover,
         .agent-card:hover,
@@ -700,7 +656,7 @@ else:
             box-shadow:
                 0 10px 25px rgba(0, 0, 0, 0.15);
 
-            border-color: #2ea043 !important;
+            border-color: #2ea043;
         }
 
 
@@ -723,7 +679,7 @@ else:
             box-shadow:
                 0 8px 20px rgba(0, 0, 0, 0.12);
 
-            border-color: #2ea043 !important;
+            border-color: #2ea043;
         }
 
 
@@ -733,7 +689,7 @@ else:
 
         .stButton > button {
 
-            border-radius: 8px !important;
+            border-radius: 8px;
 
             transition:
                 transform 0.2s ease,
@@ -756,9 +712,7 @@ else:
 
         .stDownloadButton > button {
 
-            transition:
-                transform 0.2s ease,
-                box-shadow 0.2s ease;
+            transition: all 0.2s ease;
         }
 
         .stDownloadButton > button:hover {
@@ -776,22 +730,20 @@ else:
 
         .food-result-card {
 
-            background-color: #f8f9fa !important;
+            background-color: #f8f9fa;
 
-            color: #222222 !important;
+            border: 1px solid #dddddd;
 
-            border: 1px solid #dddddd !important;
+            border-radius: 12px;
 
-            border-radius: 14px !important;
+            padding: 18px;
 
-            padding: 18px 20px !important;
-
-            margin: 10px 0 18px 0 !important;
+            margin: 10px 0;
 
             transition:
-                transform 0.3s ease,
-                box-shadow 0.3s ease,
-                border-color 0.3s ease;
+                transform 0.25s ease,
+                box-shadow 0.25s ease,
+                border-color 0.25s ease;
         }
 
         .food-result-card:hover {
@@ -801,40 +753,42 @@ else:
             box-shadow:
                 0 8px 20px rgba(0, 0, 0, 0.12);
 
-            border-color: #2ea043 !important;
+            border-color: #2ea043;
         }
 
-        .food-result-card h3 {
+        .food-result-title {
 
-            color: #222222 !important;
+            font-size: 20px;
 
-            margin-top: 0 !important;
+            font-weight: 700;
 
-            margin-bottom: 12px !important;
+            color: #222222;
+
+            margin-bottom: 8px;
         }
 
-        .food-result-card p,
-        .food-result-card li {
+        .food-result-value {
 
-            color: #222222 !important;
+            font-size: 16px;
+
+            color: #333333;
+
+            line-height: 1.6;
         }
 
-        .food-list {
+        .food-result-item {
 
-            background-color: #ffffff !important;
+            background-color: #ffffff;
 
-            border: 1px solid #dddddd !important;
+            color: #222222;
 
-            border-radius: 10px !important;
+            padding: 8px 12px;
 
-            padding: 14px 20px !important;
-        }
+            border-radius: 8px;
 
-        .food-list li {
+            margin: 5px 0;
 
-            color: #222222 !important;
-
-            margin: 6px 0 !important;
+            border: 1px solid #dddddd;
         }
 
         </style>
@@ -847,67 +801,58 @@ else:
 # HELPER FUNCTIONS
 # =========================================================
 
-def safe_text(value):
+def format_key(key):
     """
-    Convert values safely into HTML text.
+    Convert keys like:
+    unrecognized_foods
+    total_calories
+
+    into:
+    Unrecognized Foods
+    Total Calories
     """
-    return html.escape(str(value))
+
+    return str(key).replace("_", " ").title()
 
 
 def render_food_value(value):
     """
-    Render Food Log values without Streamlit creating
-    unwanted white boxes in dark mode.
+    Render Food Log results manually instead of using st.write()
+    for lists/dicts.
+
+    This prevents Streamlit from creating the white JSON/tree
+    boxes visible in dark mode.
     """
 
-    # -----------------------------------------------------
-    # DATAFRAME
-    # -----------------------------------------------------
-
-    if isinstance(value, pd.DataFrame):
-
-        st.dataframe(
-            value,
-            use_container_width=True
-        )
-
-        return
-
-
-    # -----------------------------------------------------
+    # ---------------------------------------------------------
     # DICTIONARY
-    # -----------------------------------------------------
+    # ---------------------------------------------------------
 
     if isinstance(value, dict):
 
-        inner_html = ""
+        for sub_key, sub_value in value.items():
 
-        for key, item in value.items():
+            st.markdown(
+                f"""
+                <div class="food-result-card">
 
-            inner_html += f"""
-            <p>
-                <strong>{safe_text(key).replace("_", " ").title()}:</strong>
-                {safe_text(item)}
-            </p>
-            """
+                    <div class="food-result-title">
+                        {html.escape(format_key(sub_key))}
+                    </div>
 
-        st.markdown(
-            f"""
-            <div class="food-result-card">
-                <div class="food-result-value">
-                    {inner_html}
                 </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+                """,
+                unsafe_allow_html=True
+            )
+
+            render_food_value(sub_value)
 
         return
 
 
-    # -----------------------------------------------------
+    # ---------------------------------------------------------
     # LIST / TUPLE / SET
-    # -----------------------------------------------------
+    # ---------------------------------------------------------
 
     if isinstance(value, (list, tuple, set)):
 
@@ -919,7 +864,7 @@ def render_food_value(value):
                 """
                 <div class="food-result-card">
                     <div class="food-result-value">
-                        None
+                        No items found.
                     </div>
                 </div>
                 """,
@@ -928,50 +873,64 @@ def render_food_value(value):
 
             return
 
-        list_html = ""
-
         for item in items:
 
-            if isinstance(item, dict):
+            # Nested object
+            if isinstance(item, (dict, list, tuple, set)):
 
-                list_html += f"""
-                <li>
-                    {safe_text(item)}
-                </li>
-                """
+                render_food_value(item)
 
             else:
 
-                list_html += f"""
-                <li>
-                    {safe_text(item)}
-                </li>
-                """
+                safe_item = html.escape(str(item))
 
-        st.markdown(
-            f"""
-            <div class="food-result-card">
-                <ul class="food-list">
-                    {list_html}
-                </ul>
-            </div>
-            """,
-            unsafe_allow_html=True
+                st.markdown(
+                    f"""
+                    <div class="food-result-item">
+                        🍴 {safe_item}
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+        return
+
+
+    # ---------------------------------------------------------
+    # NONE
+    # ---------------------------------------------------------
+
+    if value is None:
+
+        return
+
+
+    # ---------------------------------------------------------
+    # DATAFRAME
+    # ---------------------------------------------------------
+
+    if isinstance(value, pd.DataFrame):
+
+        st.dataframe(
+            value,
+            use_container_width=True
         )
 
         return
 
 
-    # -----------------------------------------------------
+    # ---------------------------------------------------------
     # NORMAL VALUE
-    # -----------------------------------------------------
+    # ---------------------------------------------------------
+
+    safe_value = html.escape(str(value))
 
     st.markdown(
         f"""
         <div class="food-result-card">
 
             <div class="food-result-value">
-                {safe_text(value)}
+                {safe_value}
             </div>
 
         </div>
@@ -982,38 +941,74 @@ def render_food_value(value):
 
 def render_food_result(result):
     """
-    Render the complete Food Log result.
+    Properly display Food Log agent response.
     """
 
-    if isinstance(result, dict):
+    if result is None:
 
-        for key, value in result.items():
+        return
 
-            title = key.replace(
-                "_",
-                " "
-            ).title()
 
-            st.markdown(
-                f"### {safe_text(title)}"
-            )
+    # ---------------------------------------------------------
+    # DATAFRAME
+    # ---------------------------------------------------------
 
-            render_food_value(value)
-
-    elif isinstance(result, pd.DataFrame):
+    if isinstance(result, pd.DataFrame):
 
         st.dataframe(
             result,
             use_container_width=True
         )
 
-    elif isinstance(result, (list, tuple, set)):
+        return
+
+
+    # ---------------------------------------------------------
+    # DICTIONARY
+    # ---------------------------------------------------------
+
+    if isinstance(result, dict):
+
+        for key, value in result.items():
+
+            title = format_key(key)
+
+            st.markdown(
+                f"### {title}"
+            )
+
+            render_food_value(value)
+
+        return
+
+
+    # ---------------------------------------------------------
+    # LIST
+    # ---------------------------------------------------------
+
+    if isinstance(result, (list, tuple, set)):
 
         render_food_value(result)
 
-    else:
+        return
 
-        render_food_value(result)
+
+    # ---------------------------------------------------------
+    # NORMAL TEXT
+    # ---------------------------------------------------------
+
+    st.markdown(
+        f"""
+        <div class="food-result-card">
+
+            <div class="food-result-value">
+                {html.escape(str(result))}
+            </div>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 
 # =========================================================
@@ -1094,37 +1089,44 @@ if page == "🏠 Dashboard":
         unsafe_allow_html=True
     )
 
+
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
+
         st.metric(
             "🔎 Nutrition",
             "Search"
         )
 
     with col2:
+
         st.metric(
             "🍽️ Diet",
             "Personalized"
         )
 
     with col3:
+
         st.metric(
             "📝 Food Log",
             "Track"
         )
 
     with col4:
+
         st.metric(
             "❤️ Health",
             "Guidance"
         )
+
 
     st.markdown("---")
 
     st.markdown("### 🤖 Our AI Agents")
 
     c1, c2 = st.columns(2)
+
 
     with c1:
 
@@ -1145,6 +1147,7 @@ if page == "🏠 Dashboard":
             unsafe_allow_html=True
         )
 
+
         st.markdown(
             """
             <div class="agent-card">
@@ -1161,6 +1164,7 @@ if page == "🏠 Dashboard":
             """,
             unsafe_allow_html=True
         )
+
 
     with c2:
 
@@ -1179,6 +1183,7 @@ if page == "🏠 Dashboard":
             """,
             unsafe_allow_html=True
         )
+
 
         st.markdown(
             """
@@ -1209,10 +1214,12 @@ elif page == "🔎 Nutrition Knowledge":
         "Search for a food to see its nutrition information."
     )
 
+
     query = st.text_input(
         "What food or nutrition information are you looking for?",
         placeholder="Example: chicken, rice, apple..."
     )
+
 
     if st.button("🔍 Search"):
 
@@ -1246,6 +1253,7 @@ elif page == "🔎 Nutrition Knowledge":
                     f"Unable to search nutrition data: {e}"
                 )
 
+
     if st.session_state.food_result is not None:
 
         result = st.session_state.food_result
@@ -1256,6 +1264,7 @@ elif page == "🔎 Nutrition Knowledge":
             "🥗 Nutrition Information"
         )
 
+
         if isinstance(result, pd.DataFrame):
 
             st.dataframe(
@@ -1263,39 +1272,21 @@ elif page == "🔎 Nutrition Knowledge":
                 use_container_width=True
             )
 
+
         elif isinstance(result, dict):
 
             for key, value in result.items():
 
                 st.markdown(
-                    f"""
-                    <div class="food-result-card">
-
-                    <h3>{safe_text(key.replace("_", " ").title())}</h3>
-
-                    <div class="food-result-value">
-                    {safe_text(value)}
-                    </div>
-
-                    </div>
-                    """,
-                    unsafe_allow_html=True
+                    f"### {format_key(key)}"
                 )
+
+                render_food_value(value)
+
 
         else:
 
-            st.markdown(
-                f"""
-                <div class="food-result-card">
-
-                <div class="food-result-value">
-                {safe_text(result)}
-                </div>
-
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+            render_food_value(result)
 
 
 # =========================================================
@@ -1309,10 +1300,13 @@ elif page == "🍽️ Diet Recommendation":
     )
 
     st.write(
-        "Tell us a little about yourself and we'll create a simple nutrition plan for you."
+        "Tell us a little about yourself and we'll create "
+        "a simple nutrition plan for you."
     )
 
+
     col1, col2 = st.columns(2)
+
 
     with col1:
 
@@ -1323,6 +1317,7 @@ elif page == "🍽️ Diet Recommendation":
             value=20
         )
 
+
         gender = st.selectbox(
             "Gender",
             [
@@ -1331,6 +1326,7 @@ elif page == "🍽️ Diet Recommendation":
             ]
         )
 
+
         weight = st.number_input(
             "Weight (kg)",
             min_value=1.0,
@@ -1338,12 +1334,14 @@ elif page == "🍽️ Diet Recommendation":
             value=60.0
         )
 
+
         height = st.number_input(
             "Height (cm)",
             min_value=50.0,
             max_value=250.0,
             value=165.0
         )
+
 
     with col2:
 
@@ -1362,14 +1360,17 @@ elif page == "🍽️ Diet Recommendation":
                 "Active"
         }
 
+
         activity_label = st.selectbox(
             "How active are you?",
             list(activity_options.keys())
         )
 
+
         activity_level = activity_options[
             activity_label
         ]
+
 
         goal = st.selectbox(
             "What is your main goal?",
@@ -1381,6 +1382,7 @@ elif page == "🍽️ Diet Recommendation":
             ]
         )
 
+
         diet_type = st.selectbox(
             "What type of food do you prefer?",
             [
@@ -1389,6 +1391,7 @@ elif page == "🍽️ Diet Recommendation":
                 "Vegan"
             ]
         )
+
 
         cultural_preference = st.selectbox(
             "What type of cuisine do you prefer?",
@@ -1401,7 +1404,9 @@ elif page == "🍽️ Diet Recommendation":
             ]
         )
 
+
     st.markdown("---")
+
 
     if st.button(
         "🍽️ Generate My Diet Plan"
@@ -1420,9 +1425,11 @@ elif page == "🍽️ Diet Recommendation":
                 cultural_preference=cultural_preference
             )
 
+
             st.success(
                 "Your personalized nutrition plan is ready!"
             )
+
 
             if isinstance(result, dict):
 
@@ -1438,12 +1445,14 @@ elif page == "🍽️ Diet Recommendation":
 
                     c1, c2, c3 = st.columns(3)
 
+
                     with c1:
 
                         st.metric(
                             "BMI",
                             result.get("bmi")
                         )
+
 
                     with c2:
 
@@ -1454,6 +1463,7 @@ elif page == "🍽️ Diet Recommendation":
                                 "N/A"
                             )
                         )
+
 
                     with c3:
 
@@ -1468,6 +1478,7 @@ elif page == "🍽️ Diet Recommendation":
                             )
                         )
 
+
                 # -------------------------------------------------
                 # MACROS
                 # -------------------------------------------------
@@ -1480,12 +1491,14 @@ elif page == "🍽️ Diet Recommendation":
 
                     macros = result["macros"]
 
+
                     if isinstance(
                         macros,
                         dict
                     ):
 
                         c1, c2, c3 = st.columns(3)
+
 
                         with c1:
 
@@ -1494,6 +1507,7 @@ elif page == "🍽️ Diet Recommendation":
                                 f"{macros.get('protein', 0)} g"
                             )
 
+
                         with c2:
 
                             st.metric(
@@ -1501,12 +1515,14 @@ elif page == "🍽️ Diet Recommendation":
                                 f"{macros.get('carbs', 0)} g"
                             )
 
+
                         with c3:
 
                             st.metric(
                                 "Fat",
                                 f"{macros.get('fat', 0)} g"
                             )
+
 
                 # -------------------------------------------------
                 # MEAL PLAN
@@ -1522,6 +1538,7 @@ elif page == "🍽️ Diet Recommendation":
                         "meal_plan"
                     ]
 
+
                     if isinstance(
                         meal_plan,
                         dict
@@ -1530,31 +1547,19 @@ elif page == "🍽️ Diet Recommendation":
                         for meal, foods in meal_plan.items():
 
                             st.markdown(
-                                f"### 🍴 {meal}"
+                                f"### 🍴 {format_key(meal)}"
                             )
 
-                            if isinstance(
-                                foods,
-                                list
-                            ):
-
-                                for food in foods:
-
-                                    st.write(
-                                        f"• {food}"
-                                    )
-
-                            else:
-
-                                st.write(
-                                    foods
-                                )
+                            render_food_value(
+                                foods
+                            )
 
                     else:
 
-                        st.write(
+                        render_food_value(
                             meal_plan
                         )
+
 
                 # -------------------------------------------------
                 # HEALTH ADVICE
@@ -1566,9 +1571,10 @@ elif page == "🍽️ Diet Recommendation":
                         "❤️ Health Advice"
                     )
 
-                    st.write(
+                    render_food_value(
                         result["health_advice"]
                     )
+
 
                 # -------------------------------------------------
                 # ALLERGY WARNING
@@ -1580,40 +1586,44 @@ elif page == "🍽️ Diet Recommendation":
                         result["allergy_warning"]
                     )
 
+
                 # -------------------------------------------------
                 # OTHER RESULTS
                 # -------------------------------------------------
 
+                excluded_keys = [
+                    "bmi",
+                    "bmr",
+                    "daily_calories",
+                    "calories",
+                    "macros",
+                    "meal_plan",
+                    "health_advice",
+                    "allergy_warning"
+                ]
+
+
                 for key, value in result.items():
 
-                    if key not in [
-
-                        "bmi",
-                        "bmr",
-                        "daily_calories",
-                        "calories",
-                        "macros",
-                        "meal_plan",
-                        "health_advice",
-                        "allergy_warning"
-
-                    ]:
+                    if key not in excluded_keys:
 
                         if value:
 
                             st.markdown(
-                                f"### {key.replace('_', ' ').title()}"
+                                f"### {format_key(key)}"
                             )
 
-                            st.write(
+                            render_food_value(
                                 value
                             )
 
+
             else:
 
-                st.write(
+                render_food_value(
                     result
                 )
+
 
         except Exception as e:
 
@@ -1634,6 +1644,7 @@ elif page == "📝 Food Log":
         "Record what you eat and keep track of your meals."
     )
 
+
     input_type = st.radio(
         "How would you like to add your meal?",
         [
@@ -1643,6 +1654,7 @@ elif page == "📝 Food Log":
         ],
         horizontal=True
     )
+
 
     meal_text = ""
 
@@ -1656,7 +1668,8 @@ elif page == "📝 Food Log":
         meal_text = st.text_area(
             "What did you eat?",
             placeholder=(
-                "Example: 2 idlis with sambar and one banana"
+                "Example: 2 idlis with sambar "
+                "and one banana"
             )
         )
 
@@ -1674,8 +1687,10 @@ elif page == "📝 Food Log":
                 "jpeg",
                 "png",
                 "webp"
-            ]
+            ],
+            accept_multiple_files=False
         )
+
 
         if uploaded_image:
 
@@ -1685,8 +1700,12 @@ elif page == "📝 Food Log":
                 use_container_width=True
             )
 
+
             meal_text = st.text_input(
-                "What foods are in the image?"
+                "What foods are in the image?",
+                placeholder=(
+                    "Example: idli, sambar, banana"
+                )
             )
 
 
@@ -1699,6 +1718,7 @@ elif page == "📝 Food Log":
         st.info(
             "Voice input can be connected to a speech-to-text service."
         )
+
 
         meal_text = st.text_input(
             "Enter what you said"
@@ -1730,17 +1750,24 @@ elif page == "📝 Food Log":
                     meal_text
                 )
 
+
                 st.success(
                     "Meal analyzed successfully!"
                 )
 
+
+                # =================================================
                 # IMPORTANT:
-                # Use custom renderer instead of st.write()
-                # so dark mode does not create white boxes.
+                # USE CUSTOM RENDERER
+                # INSTEAD OF st.write(value)
+                #
+                # This fixes the white boxes.
+                # =================================================
 
                 render_food_result(
                     result
                 )
+
 
             except Exception as e:
 
@@ -1757,6 +1784,7 @@ elif page == "📝 Food Log":
 
         st.markdown("---")
 
+
         if st.button(
             "💾 Save Meal"
         ):
@@ -1767,9 +1795,11 @@ elif page == "📝 Food Log":
                     meal_text
                 )
 
+
                 st.success(
                     "Meal saved successfully!"
                 )
+
 
             except Exception as e:
 
@@ -1788,9 +1818,11 @@ elif page == "📝 Food Log":
         "📈 Meal History"
     )
 
+
     try:
 
         logs = get_meal_logs()
+
 
         if logs:
 
@@ -1798,10 +1830,12 @@ elif page == "📝 Food Log":
                 logs
             )
 
+
             st.dataframe(
                 df_logs,
                 use_container_width=True
             )
+
 
             numeric_columns = (
                 df_logs
@@ -1812,9 +1846,11 @@ elif page == "📝 Food Log":
                 .tolist()
             )
 
+
             if numeric_columns:
 
                 y_column = numeric_columns[0]
+
 
                 fig = px.line(
                     df_logs,
@@ -1822,16 +1858,19 @@ elif page == "📝 Food Log":
                     title="Nutrition History"
                 )
 
+
                 st.plotly_chart(
                     fig,
                     use_container_width=True
                 )
+
 
         else:
 
             st.info(
                 "No meal history available yet."
             )
+
 
     except Exception:
 
@@ -1854,6 +1893,7 @@ elif page == "❤️ Health Advisory":
         "Get simple nutrition guidance based on your health needs."
     )
 
+
     condition = st.selectbox(
         "What would you like nutrition guidance for?",
         [
@@ -1869,12 +1909,14 @@ elif page == "❤️ Health Advisory":
         ]
     )
 
+
     question = st.text_area(
         "Tell us what you would like to know",
         placeholder=(
             "Example: What foods should I include in my diet?"
         )
     )
+
 
     if st.button(
         "❤️ Get Health Advice"
@@ -1883,8 +1925,10 @@ elif page == "❤️ Health Advisory":
         if not question.strip():
 
             question = (
-                f"Give general nutrition guidance for {condition}"
+                f"Give general nutrition guidance "
+                f"for {condition}"
             )
+
 
         try:
 
@@ -1893,9 +1937,11 @@ elif page == "❤️ Health Advisory":
                 question
             )
 
+
             st.success(
                 "Health guidance generated."
             )
+
 
             if isinstance(
                 result,
@@ -1905,23 +1951,27 @@ elif page == "❤️ Health Advisory":
                 for key, value in result.items():
 
                     st.markdown(
-                        f"### {key.replace('_', ' ').title()}"
+                        f"### {format_key(key)}"
                     )
 
-                    st.write(
+                    render_food_value(
                         value
                     )
 
+
             else:
 
-                st.write(
+                render_food_value(
                     result
                 )
 
+
             st.info(
-                "⚠️ This information is for general educational purposes "
-                "and is not a substitute for professional medical advice."
+                "⚠️ This information is for general educational "
+                "purposes and is not a substitute for professional "
+                "medical advice."
             )
+
 
         except Exception as e:
 
@@ -1940,19 +1990,23 @@ elif page == "🔐 Owner / Admin":
         "🔐 Owner / Admin"
     )
 
+
     st.write(
         "This section is available only to the project owner."
     )
+
 
     password = st.text_input(
         "Admin Password",
         type="password"
     )
 
+
     admin_password = os.getenv(
         "NUTRIAI_ADMIN_PASSWORD",
         "admin123"
     )
+
 
     if st.button(
         "🔓 Login"
@@ -1967,15 +2021,13 @@ elif page == "🔐 Owner / Admin":
                 "Admin access granted."
             )
 
-            st.markdown("---")
 
-            # =================================================
-            # USER FEEDBACK
-            # =================================================
+            st.markdown("---")
 
             st.subheader(
                 "📊 User Feedback"
             )
+
 
             try:
 
@@ -1983,12 +2035,15 @@ elif page == "🔐 Owner / Admin":
                     FEEDBACK_DB
                 )
 
+
                 feedback_df = pd.read_sql_query(
                     "SELECT * FROM feedback",
                     conn
                 )
 
+
                 conn.close()
+
 
                 if not feedback_df.empty:
 
@@ -2003,6 +2058,7 @@ elif page == "🔐 Owner / Admin":
                         "No feedback available."
                     )
 
+
             except Exception:
 
                 st.info(
@@ -2012,14 +2068,10 @@ elif page == "🔐 Owner / Admin":
 
             st.markdown("---")
 
-
-            # =================================================
-            # NUTRITION DATASET
-            # =================================================
-
             st.subheader(
                 "📁 Nutrition Dataset"
             )
+
 
             try:
 
@@ -2031,14 +2083,17 @@ elif page == "🔐 Owner / Admin":
                         "nutrition_data.csv"
                     )
 
+
                     st.dataframe(
                         nutrition_df,
                         use_container_width=True
                     )
 
+
                     csv_data = nutrition_df.to_csv(
                         index=False
                     )
+
 
                     st.download_button(
                         "⬇️ Download Nutrition Data",
@@ -2047,17 +2102,20 @@ elif page == "🔐 Owner / Admin":
                         "text/csv"
                     )
 
+
                 else:
 
                     st.warning(
                         "nutrition_data.csv not found."
                     )
 
+
             except Exception as e:
 
                 st.error(
                     f"Unable to load dataset: {e}"
                 )
+
 
         else:
 
@@ -2074,6 +2132,7 @@ elif page == "🔐 Owner / Admin":
 
 st.markdown("---")
 
+
 st.markdown(
     """
     <div style="
@@ -2081,15 +2140,15 @@ st.markdown(
         padding:20px;
     ">
 
-    <h4>🥗 NutriAI</h4>
+        <h4>🥗 NutriAI</h4>
 
-    <p>
-    Intelligent Multi-Agent Nutrition Assistant
-    </p>
+        <p>
+        Intelligent Multi-Agent Nutrition Assistant
+        </p>
 
-    <p>
-    Eat Better • Live Better • Stay Healthy
-    </p>
+        <p>
+        Eat Better • Live Better • Stay Healthy
+        </p>
 
     </div>
     """,
