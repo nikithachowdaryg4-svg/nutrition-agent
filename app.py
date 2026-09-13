@@ -71,27 +71,31 @@ if st.session_state.dark_mode:
         """
         <style>
 
-        /* Main application */
+        /* =====================================================
+           MAIN APPLICATION
+        ===================================================== */
+
         .stApp {
             background-color: #0e1117;
             color: white;
         }
 
-        /* Main text */
         .stApp p,
         .stApp span,
         .stApp li,
-        .stApp label,
-        .stApp div {
+        .stApp label {
             color: white;
         }
 
-        /* Headings */
         h1, h2, h3, h4, h5, h6 {
             color: white !important;
         }
 
-        /* Sidebar */
+
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
+
         section[data-testid="stSidebar"] {
             background-color: #161b22;
         }
@@ -100,7 +104,11 @@ if st.session_state.dark_mode:
             color: white !important;
         }
 
-        /* Cards */
+
+        /* =====================================================
+           CARDS
+        ===================================================== */
+
         .dashboard-card,
         .agent-card,
         .info-card {
@@ -109,14 +117,44 @@ if st.session_state.dark_mode:
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 15px;
+
+            transition:
+                transform 0.3s ease,
+                box-shadow 0.3s ease,
+                border-color 0.3s ease;
         }
 
-        /* Metrics */
+        /* ⭐ HOVER EFFECT */
+
+        .dashboard-card:hover,
+        .agent-card:hover,
+        .info-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+            border-color: #2ea043;
+        }
+
+
+        /* =====================================================
+           METRICS
+        ===================================================== */
+
         [data-testid="stMetric"] {
             background-color: #161b22;
             border: 1px solid #30363d;
             border-radius: 12px;
             padding: 15px;
+
+            transition:
+                transform 0.3s ease,
+                box-shadow 0.3s ease,
+                border-color 0.3s ease;
+        }
+
+        [data-testid="stMetric"]:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border-color: #2ea043;
         }
 
         [data-testid="stMetricLabel"],
@@ -125,7 +163,11 @@ if st.session_state.dark_mode:
             color: white !important;
         }
 
-        /* Text inputs */
+
+        /* =====================================================
+           TEXT INPUTS
+        ===================================================== */
+
         input,
         textarea {
             background-color: #161b22 !important;
@@ -138,13 +180,21 @@ if st.session_state.dark_mode:
             color: #b1bac4 !important;
         }
 
-        /* Number inputs */
+
+        /* =====================================================
+           NUMBER INPUT
+        ===================================================== */
+
         [data-testid="stNumberInput"] input {
             background-color: #161b22 !important;
             color: white !important;
         }
 
-        /* Select boxes */
+
+        /* =====================================================
+           SELECT BOX
+        ===================================================== */
+
         div[data-baseweb="select"] > div {
             background-color: #161b22 !important;
             color: white !important;
@@ -155,7 +205,11 @@ if st.session_state.dark_mode:
             color: white !important;
         }
 
-        /* Dropdown */
+
+        /* =====================================================
+           DROPDOWN
+        ===================================================== */
+
         [role="listbox"] {
             background-color: #161b22 !important;
             color: white !important;
@@ -171,17 +225,29 @@ if st.session_state.dark_mode:
             color: white !important;
         }
 
-        /* Radio buttons */
+
+        /* =====================================================
+           RADIO BUTTONS
+        ===================================================== */
+
         [data-testid="stRadio"] label {
             color: white !important;
         }
 
-        /* Checkbox */
+
+        /* =====================================================
+           CHECKBOX
+        ===================================================== */
+
         [data-testid="stCheckbox"] label {
             color: white !important;
         }
 
-        /* Slider */
+
+        /* =====================================================
+           SLIDER
+        ===================================================== */
+
         [data-testid="stSlider"] label {
             color: white !important;
         }
@@ -190,26 +256,54 @@ if st.session_state.dark_mode:
             color: white !important;
         }
 
-        /* Buttons */
+
+        /* =====================================================
+           BUTTONS
+        ===================================================== */
+
         .stButton > button {
             background-color: #238636 !important;
             color: white !important;
             border: none !important;
             border-radius: 8px !important;
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                background-color 0.2s ease;
         }
+
+        /* ⭐ BUTTON HOVER */
 
         .stButton > button:hover {
             background-color: #2ea043 !important;
             color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 160, 67, 0.35);
         }
 
-        /* Download button */
+
+        /* =====================================================
+           DOWNLOAD BUTTON
+        ===================================================== */
+
         .stDownloadButton > button {
             background-color: #238636 !important;
             color: white !important;
+            transition: all 0.2s ease;
         }
 
-        /* Expander */
+        .stDownloadButton > button:hover {
+            background-color: #2ea043 !important;
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+
+        /* =====================================================
+           EXPANDER
+        ===================================================== */
+
         details {
             background-color: #161b22 !important;
             border: 1px solid #30363d !important;
@@ -219,7 +313,11 @@ if st.session_state.dark_mode:
             color: white !important;
         }
 
-        /* Markdown */
+
+        /* =====================================================
+           MARKDOWN
+        ===================================================== */
+
         [data-testid="stMarkdownContainer"] {
             color: white !important;
         }
@@ -230,17 +328,29 @@ if st.session_state.dark_mode:
             color: white !important;
         }
 
-        /* Tables */
+
+        /* =====================================================
+           TABLES
+        ===================================================== */
+
         [data-testid="stDataFrame"] {
             background-color: #161b22 !important;
         }
 
-        /* Success / warning / info boxes */
+
+        /* =====================================================
+           ALERTS
+        ===================================================== */
+
         [data-testid="stAlert"] {
             color: white !important;
         }
 
-        /* File uploader */
+
+        /* =====================================================
+           FILE UPLOADER
+        ===================================================== */
+
         [data-testid="stFileUploader"] {
             background-color: #161b22 !important;
             color: white !important;
@@ -254,6 +364,11 @@ if st.session_state.dark_mode:
         """,
         unsafe_allow_html=True
     )
+
+
+# =========================================================
+# LIGHT MODE CSS
+# =========================================================
 
 else:
 
@@ -270,6 +385,11 @@ else:
             color: #222222;
         }
 
+
+        /* =====================================================
+           CARDS
+        ===================================================== */
+
         .dashboard-card,
         .agent-card,
         .info-card {
@@ -278,10 +398,72 @@ else:
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 15px;
+
+            transition:
+                transform 0.3s ease,
+                box-shadow 0.3s ease,
+                border-color 0.3s ease;
         }
+
+        /* ⭐ HOVER EFFECT */
+
+        .dashboard-card:hover,
+        .agent-card:hover,
+        .info-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border-color: #2ea043;
+        }
+
+
+        /* =====================================================
+           METRICS
+        ===================================================== */
+
+        [data-testid="stMetric"] {
+            transition:
+                transform 0.3s ease,
+                box-shadow 0.3s ease,
+                border-color 0.3s ease;
+        }
+
+        [data-testid="stMetric"]:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            border-color: #2ea043;
+        }
+
+
+        /* =====================================================
+           BUTTONS
+        ===================================================== */
 
         .stButton > button {
             border-radius: 8px;
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                background-color 0.2s ease;
+        }
+
+        .stButton > button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+
+        /* =====================================================
+           DOWNLOAD BUTTON
+        ===================================================== */
+
+        .stDownloadButton > button {
+            transition: all 0.2s ease;
+        }
+
+        .stDownloadButton > button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
         }
 
         </style>
@@ -556,9 +738,9 @@ elif page == "🍽️ Diet Recommendation":
 
     with col2:
 
-        # -------------------------------------------------
+        # =====================================================
         # FRIENDLY ACTIVITY LEVELS
-        # -------------------------------------------------
+        # =====================================================
 
         activity_options = {
 
@@ -582,7 +764,7 @@ elif page == "🍽️ Diet Recommendation":
 
         activity_level = activity_options[activity_label]
 
-        # -------------------------------------------------
+        # =====================================================
 
         goal = st.selectbox(
             "What is your main goal?",
@@ -633,10 +815,6 @@ elif page == "🍽️ Diet Recommendation":
 
             st.success("Your personalized nutrition plan is ready!")
 
-            # -------------------------------------------------
-            # BMI
-            # -------------------------------------------------
-
             if isinstance(result, dict):
 
                 if "bmi" in result:
@@ -666,10 +844,6 @@ elif page == "🍽️ Diet Recommendation":
                             )
                         )
 
-                # -------------------------------------------------
-                # MACROS
-                # -------------------------------------------------
-
                 if "macros" in result:
 
                     st.subheader("🥗 Daily Macronutrients")
@@ -698,10 +872,6 @@ elif page == "🍽️ Diet Recommendation":
                                 f"{macros.get('fat', 0)} g"
                             )
 
-                # -------------------------------------------------
-                # MEAL PLAN
-                # -------------------------------------------------
-
                 if "meal_plan" in result:
 
                     st.subheader("🍱 Meal Plan")
@@ -726,10 +896,6 @@ elif page == "🍽️ Diet Recommendation":
 
                         st.write(meal_plan)
 
-                # -------------------------------------------------
-                # HEALTH ADVICE
-                # -------------------------------------------------
-
                 if "health_advice" in result:
 
                     st.subheader("❤️ Health Advice")
@@ -738,19 +904,11 @@ elif page == "🍽️ Diet Recommendation":
                         result["health_advice"]
                     )
 
-                # -------------------------------------------------
-                # ALLERGY WARNING
-                # -------------------------------------------------
-
                 if "allergy_warning" in result:
 
                     st.warning(
                         result["allergy_warning"]
                     )
-
-                # -------------------------------------------------
-                # DISPLAY OTHER RESULTS
-                # -------------------------------------------------
 
                 for key, value in result.items():
 
@@ -808,20 +966,12 @@ elif page == "📝 Food Log":
 
     meal_text = ""
 
-    # ---------------------------------------------------------
-    # TEXT
-    # ---------------------------------------------------------
-
     if input_type == "⌨️ Text":
 
         meal_text = st.text_area(
             "What did you eat?",
             placeholder="Example: 2 idlis with sambar and one banana"
         )
-
-    # ---------------------------------------------------------
-    # IMAGE
-    # ---------------------------------------------------------
 
     elif input_type == "🖼️ Image":
 
@@ -845,10 +995,6 @@ elif page == "📝 Food Log":
             meal_text = st.text_input(
                 "What foods are in the image?"
             )
-
-    # ---------------------------------------------------------
-    # VOICE
-    # ---------------------------------------------------------
 
     else:
 
@@ -902,10 +1048,6 @@ elif page == "📝 Food Log":
                     f"Unable to analyze meal: {e}"
                 )
 
-    # ---------------------------------------------------------
-    # SAVE MEAL
-    # ---------------------------------------------------------
-
     if meal_text.strip():
 
         st.markdown("---")
@@ -928,10 +1070,6 @@ elif page == "📝 Food Log":
                     f"Unable to save meal: {e}"
                 )
 
-    # ---------------------------------------------------------
-    # MEAL HISTORY
-    # ---------------------------------------------------------
-
     st.markdown("---")
 
     st.subheader("📈 Meal History")
@@ -948,8 +1086,6 @@ elif page == "📝 Food Log":
                 df_logs,
                 use_container_width=True
             )
-
-            # Try to create chart when suitable numeric data exists
 
             numeric_columns = df_logs.select_dtypes(
                 include="number"
@@ -976,7 +1112,7 @@ elif page == "📝 Food Log":
                 "No meal history available yet."
             )
 
-    except Exception as e:
+    except Exception:
 
         st.info(
             "Meal history is not available yet."
