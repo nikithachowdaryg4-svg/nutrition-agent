@@ -9,6 +9,98 @@ from nutrition_agent import NutritionAgent
 from diet_agent import DietRecommendationAgent
 from health_agent import HealthAdvisoryAgent
 from food_log_agent import FoodLogAgent
+def render_value(value):
+    """
+    Render agent results without Streamlit's white JSON boxes.
+    Works with dictionaries, lists, numbers and text.
+    """
+
+    if isinstance(value, dict):
+
+        for key, sub_value in value.items():
+
+            title = str(key).replace("_", " ").title()
+
+            st.markdown(
+                f"""
+                <div class="result-card">
+                    <div class="result-title">{title}</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            render_value(sub_value)
+
+    elif isinstance(value, (list, tuple, set)):
+
+        for item in value:
+
+            st.markdown(
+                f"""
+                <div class="result-item">
+                    • {item}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+    elif isinstance(value, (int, float)):
+
+        st.markdown(
+            f"""
+            <div class="result-value">
+                {value}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    else:
+
+        text = str(value)
+
+        # Remove accidental HTML from agent output
+        import re
+        from html import unescape
+
+        text = unescape(text)
+
+        text = re.sub(
+            r"<li[^>]*>",
+            "• ",
+            text,
+            flags=re.IGNORECASE
+        )
+
+        text = re.sub(
+            r"</li>",
+            "<br>",
+            text,
+            flags=re.IGNORECASE
+        )
+
+        text = re.sub(
+            r"<br\s*/?>",
+            "<br>",
+            text,
+            flags=re.IGNORECASE
+        )
+
+        text = re.sub(
+            r"<[^>]+>",
+            "",
+            text
+        )
+
+        st.markdown(
+            f"""
+            <div class="result-value">
+                {text}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 from database import (
     create_tables,
