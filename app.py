@@ -4,8 +4,8 @@ import plotly.express as px
 import sqlite3
 import os
 import hmac
-from nutrition_agent import NutritionAgent
 
+from nutrition_agent import NutritionAgent
 from diet_agent import DietRecommendationAgent
 from health_agent import HealthAdvisoryAgent
 from food_log_agent import FoodLogAgent
@@ -17,79 +17,9 @@ from database import (
 )
 
 
-# ==================================================
-# DATABASE
-# ==================================================
-
-create_tables()
-
-
-# ==================================================
-# USER FEEDBACK DATABASE
-# ==================================================
-FEEDBACK_DB = "user_feedback.db"
-
-
-def create_feedback_table():
-    """Create the user feedback table if it does not exist."""
-    connection = sqlite3.connect(FEEDBACK_DB)
-    cursor = connection.cursor()
-
-    cursor.execute(
-        """
-        CREATE TABLE IF NOT EXISTS user_feedback (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            meal TEXT,
-            rating INTEGER NOT NULL,
-            feedback TEXT,
-            submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-        """
-    )
-
-    connection.commit()
-    connection.close()
-
-
-def save_user_feedback(meal, rating, feedback):
-    """Save user feedback to SQLite."""
-    connection = sqlite3.connect(FEEDBACK_DB)
-    cursor = connection.cursor()
-
-    cursor.execute(
-        """
-        INSERT INTO user_feedback (meal, rating, feedback)
-        VALUES (?, ?, ?)
-        """,
-        (meal, rating, feedback)
-    )
-
-    connection.commit()
-    connection.close()
-
-
-def get_user_feedback():
-    """Return all submitted user feedback."""
-    connection = sqlite3.connect(FEEDBACK_DB)
-
-    rows = connection.execute(
-        """
-        SELECT id, meal, rating, feedback, submitted_at
-        FROM user_feedback
-        ORDER BY id DESC
-        """
-    ).fetchall()
-
-    connection.close()
-    return rows
-
-
-create_feedback_table()
-
-
-# ==================================================
-# PAGE CONFIGURATION
-# ==================================================
+# =========================================================
+# PAGE CONFIG
+# =========================================================
 
 st.set_page_config(
     page_title="NutriAI",
@@ -99,9 +29,18 @@ st.set_page_config(
 )
 
 
-# ==================================================
+# =========================================================
+# DATABASE
+# =========================================================
+
+create_tables()
+
+FEEDBACK_DB = "user_feedback.db"
+
+
+# =========================================================
 # SESSION STATE
-# ==================================================
+# =========================================================
 
 if "dark_mode" not in st.session_state:
     st.session_state.dark_mode = False
@@ -110,52 +49,21 @@ if "food_result" not in st.session_state:
     st.session_state.food_result = None
 
 
-# ==================================================
-# SIDEBAR
-# ==================================================
+# =========================================================
+# DARK / LIGHT MODE
+# =========================================================
 
-st.sidebar.title("🥗 NutriAI")
-
-st.sidebar.markdown(
-    """
-    **Intelligent Multi-Agent Nutrition Agent**
-
-    Personalized nutrition powered by AI,
-    RAG and multi-agent architecture.
-    """
-)
-
-st.sidebar.divider()
-
-page = st.sidebar.radio(
-    "Navigation",
-    [
-        "🏠 Dashboard",
-        "🔎 Nutrition Knowledge",
-        "🍱 Diet Recommendation",
-        "📝 Food Log",
-        "❤️ Health Advisory",
-        "🔐 Owner / Admin"
-    ]
-)
-
-st.sidebar.divider()
+st.sidebar.markdown("## ⚙️ Settings")
 
 st.session_state.dark_mode = st.sidebar.toggle(
     "🌙 Dark Mode",
     value=st.session_state.dark_mode
 )
 
-st.sidebar.markdown("---")
 
-st.sidebar.caption(
-    "NutriAI • AI-powered nutrition assistant"
-)
-
-
-# ==================================================
-# CUSTOM CSS
-# ==================================================
+# =========================================================
+# DARK MODE CSS
+# =========================================================
 
 if st.session_state.dark_mode:
 
@@ -163,175 +71,183 @@ if st.session_state.dark_mode:
         """
         <style>
 
-        /* =========================================
-           DARK MODE
-           ========================================= */
-
+        /* Main application */
         .stApp {
-            background-color: #0f172a !important;
-            color: #f8fafc !important;
+            background-color: #0e1117;
+            color: white;
         }
 
-        .main {
-            padding-top: 1rem;
-        }
-
-        .stApp h1,
-        .stApp h2,
-        .stApp h3,
-        .stApp h4,
-        .stApp h5,
-        .stApp h6,
+        /* Main text */
         .stApp p,
-        .stApp label {
-            color: #f8fafc !important;
+        .stApp span,
+        .stApp li,
+        .stApp label,
+        .stApp div {
+            color: white;
         }
 
-
-        /* SIDEBAR */
-
-        [data-testid="stSidebar"] {
-            background-color: #111827 !important;
+        /* Headings */
+        h1, h2, h3, h4, h5, h6 {
+            color: white !important;
         }
 
-        [data-testid="stSidebar"] * {
-            color: #f8fafc !important;
+        /* Sidebar */
+        section[data-testid="stSidebar"] {
+            background-color: #161b22;
         }
 
-
-        /* DASHBOARD CARDS */
-
-        .dashboard-card {
-            background-color: #1e293b;
-            color: #f8fafc;
-            padding: 22px;
-            border-radius: 18px;
-            border: 1px solid #334155;
-            text-align: center;
-            transition:
-                transform 0.3s ease,
-                box-shadow 0.3s ease,
-                border 0.3s ease;
-            cursor: pointer;
-            margin-bottom: 15px;
+        section[data-testid="stSidebar"] * {
+            color: white !important;
         }
 
-        .dashboard-card:hover {
-            transform: scale(1.04) translateY(-8px);
-            box-shadow:
-                0 18px 40px rgba(0, 166, 126, 0.35);
-            border: 2px solid #00A67E;
-        }
-
-        .dashboard-card h2 {
-            color: #00A67E !important;
-            margin-bottom: 5px;
-        }
-
-        .dashboard-card h4 {
-            color: #f8fafc !important;
-        }
-
-        .dashboard-card p {
-            color: #cbd5e1 !important;
-        }
-
-
-        /* AGENT CARDS */
-
-        .agent-card {
-            background-color: #1e293b;
-            color: #f8fafc;
-            padding: 20px;
-            border-radius: 18px;
-            border: 1px solid #334155;
-            transition:
-                transform 0.3s ease,
-                box-shadow 0.3s ease,
-                border 0.3s ease;
-            cursor: pointer;
-            margin-bottom: 15px;
-        }
-
-        .agent-card:hover {
-            transform: scale(1.03) translateY(-7px);
-            box-shadow:
-                0 15px 35px rgba(0, 166, 126, 0.30);
-            border: 2px solid #00A67E;
-        }
-
-        .agent-card h3 {
-            color: #f8fafc !important;
-            margin-bottom: 8px;
-        }
-
-        .agent-card p {
-            color: #cbd5e1 !important;
-        }
-
-
-        /* METRICS */
-
-        [data-testid="stMetric"] {
-            background-color: #1e293b !important;
-            padding: 15px;
+        /* Cards */
+        .dashboard-card,
+        .agent-card,
+        .info-card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
             border-radius: 15px;
-            border: 1px solid #334155;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        /* Metrics */
+        [data-testid="stMetric"] {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 15px;
         }
 
         [data-testid="stMetricLabel"],
-        [data-testid="stMetricValue"] {
-            color: #f8fafc !important;
+        [data-testid="stMetricValue"],
+        [data-testid="stMetricDelta"] {
+            color: white !important;
         }
 
-
-        /* INPUTS */
-
+        /* Text inputs */
         input,
         textarea {
-            background-color: #1e293b !important;
-            color: #f8fafc !important;
-            border-color: #475569 !important;
+            background-color: #161b22 !important;
+            color: white !important;
+            border: 1px solid #484f58 !important;
         }
 
         input::placeholder,
         textarea::placeholder {
-            color: #94a3b8 !important;
+            color: #b1bac4 !important;
         }
 
-
-        /* SELECT BOX */
-
-        [data-baseweb="select"] > div {
-            background-color: #1e293b !important;
-            color: #f8fafc !important;
-            border-color: #475569 !important;
+        /* Number inputs */
+        [data-testid="stNumberInput"] input {
+            background-color: #161b22 !important;
+            color: white !important;
         }
 
+        /* Select boxes */
+        div[data-baseweb="select"] > div {
+            background-color: #161b22 !important;
+            color: white !important;
+            border-color: #484f58 !important;
+        }
 
-        /* BUTTONS */
+        div[data-baseweb="select"] span {
+            color: white !important;
+        }
 
+        /* Dropdown */
+        [role="listbox"] {
+            background-color: #161b22 !important;
+            color: white !important;
+        }
+
+        [role="option"] {
+            background-color: #161b22 !important;
+            color: white !important;
+        }
+
+        [role="option"]:hover {
+            background-color: #30363d !important;
+            color: white !important;
+        }
+
+        /* Radio buttons */
+        [data-testid="stRadio"] label {
+            color: white !important;
+        }
+
+        /* Checkbox */
+        [data-testid="stCheckbox"] label {
+            color: white !important;
+        }
+
+        /* Slider */
+        [data-testid="stSlider"] label {
+            color: white !important;
+        }
+
+        [data-testid="stSlider"] div {
+            color: white !important;
+        }
+
+        /* Buttons */
         .stButton > button {
-            background-color: #00A67E !important;
+            background-color: #238636 !important;
             color: white !important;
             border: none !important;
-            border-radius: 10px;
-            padding: 10px 20px;
-            font-weight: 600;
-            transition: all 0.25s ease;
+            border-radius: 8px !important;
         }
 
         .stButton > button:hover {
-            transform: translateY(-3px);
-            box-shadow:
-                0px 8px 20px rgba(0, 166, 126, 0.35);
+            background-color: #2ea043 !important;
+            color: white !important;
         }
 
+        /* Download button */
+        .stDownloadButton > button {
+            background-color: #238636 !important;
+            color: white !important;
+        }
 
-        /* DIVIDER */
+        /* Expander */
+        details {
+            background-color: #161b22 !important;
+            border: 1px solid #30363d !important;
+        }
 
-        hr {
-            border-color: #334155 !important;
+        details summary {
+            color: white !important;
+        }
+
+        /* Markdown */
+        [data-testid="stMarkdownContainer"] {
+            color: white !important;
+        }
+
+        [data-testid="stMarkdownContainer"] p,
+        [data-testid="stMarkdownContainer"] li,
+        [data-testid="stMarkdownContainer"] span {
+            color: white !important;
+        }
+
+        /* Tables */
+        [data-testid="stDataFrame"] {
+            background-color: #161b22 !important;
+        }
+
+        /* Success / warning / info boxes */
+        [data-testid="stAlert"] {
+            color: white !important;
+        }
+
+        /* File uploader */
+        [data-testid="stFileUploader"] {
+            background-color: #161b22 !important;
+            color: white !important;
+        }
+
+        [data-testid="stFileUploader"] * {
+            color: white !important;
         }
 
         </style>
@@ -345,122 +261,27 @@ else:
         """
         <style>
 
-        /* =========================================
-           LIGHT MODE
-           ========================================= */
-
-        .main {
-            padding-top: 1rem;
+        .stApp {
+            background-color: #ffffff;
+            color: #222222;
         }
 
-
-        /* DASHBOARD CARDS */
-
-        .dashboard-card {
-            background: white;
-            padding: 22px;
-            border-radius: 18px;
-            border: 1px solid #e5e7eb;
-            text-align: center;
-            transition:
-                transform 0.3s ease,
-                box-shadow 0.3s ease,
-                border 0.3s ease;
-            cursor: pointer;
-            margin-bottom: 15px;
+        h1, h2, h3, h4, h5, h6 {
+            color: #222222;
         }
 
-        .dashboard-card:hover {
-            transform: scale(1.04) translateY(-8px);
-            box-shadow:
-                0 18px 40px rgba(0, 166, 126, 0.28);
-            border: 2px solid #00A67E;
-        }
-
-        .dashboard-card h2 {
-            color: #00A67E;
-            margin-bottom: 5px;
-        }
-
-        .dashboard-card p {
-            color: #666666;
-            margin-top: 0px;
-        }
-
-
-        /* AGENT CARDS */
-
-        .agent-card {
-            background: white;
+        .dashboard-card,
+        .agent-card,
+        .info-card {
+            background-color: #f8f9fa;
+            border: 1px solid #dddddd;
+            border-radius: 15px;
             padding: 20px;
-            border-radius: 18px;
-            border: 1px solid #e5e7eb;
-            transition:
-                transform 0.3s ease,
-                box-shadow 0.3s ease,
-                border 0.3s ease;
-            cursor: pointer;
             margin-bottom: 15px;
         }
-
-        .agent-card:hover {
-            transform: scale(1.03) translateY(-7px);
-            box-shadow:
-                0 15px 35px rgba(0, 166, 126, 0.25);
-            border: 2px solid #00A67E;
-        }
-
-        .agent-card h3 {
-            margin-bottom: 8px;
-        }
-
-        .agent-card p {
-            color: #666666;
-        }
-
-
-        /* BUTTONS */
 
         .stButton > button {
-            border-radius: 10px;
-            border: none;
-            padding: 10px 20px;
-            font-weight: 600;
-            transition: all 0.25s ease;
-        }
-
-        .stButton > button:hover {
-            transform: translateY(-2px);
-            box-shadow:
-                0px 6px 15px rgba(0, 0, 0, 0.15);
-        }
-
-
-        /* METRICS */
-
-        [data-testid="stMetric"] {
-            background: white;
-            padding: 15px;
-            border-radius: 15px;
-            border: 1px solid #e5e7eb;
-        }
-
-
-        /* INPUTS */
-
-        textarea {
-            color: #111827 !important;
-            background-color: #ffffff !important;
-        }
-
-        input {
-            color: #111827 !important;
-        }
-
-        textarea::placeholder,
-        input::placeholder {
-            color: #6b7280 !important;
-            opacity: 1 !important;
+            border-radius: 8px;
         }
 
         </style>
@@ -469,116 +290,108 @@ else:
     )
 
 
-# ==================================================
+# =========================================================
 # INITIALIZE AGENTS
-# ==================================================
+# =========================================================
 
-nutrition_agent = NutritionAgent()
-diet_agent = DietRecommendationAgent()
-health_agent = HealthAdvisoryAgent()
-food_log_agent = FoodLogAgent()
+@st.cache_resource
+def load_agents():
+
+    nutrition_agent = NutritionAgent()
+    diet_agent = DietRecommendationAgent()
+    health_agent = HealthAdvisoryAgent()
+    food_log_agent = FoodLogAgent()
+
+    return (
+        nutrition_agent,
+        diet_agent,
+        health_agent,
+        food_log_agent
+    )
 
 
-# ==================================================
+(
+    nutrition_agent,
+    diet_agent,
+    health_agent,
+    food_log_agent
+) = load_agents()
+
+
+# =========================================================
+# SIDEBAR NAVIGATION
+# =========================================================
+
+st.sidebar.markdown("## 🥗 NutriAI")
+
+page = st.sidebar.radio(
+    "Navigation",
+    [
+        "🏠 Dashboard",
+        "🔎 Nutrition Knowledge",
+        "🍽️ Diet Recommendation",
+        "📝 Food Log",
+        "❤️ Health Advisory",
+        "🔐 Owner / Admin"
+    ]
+)
+
+
+# =========================================================
 # DASHBOARD
-# ==================================================
+# =========================================================
 
 if page == "🏠 Dashboard":
 
     st.title("🥗 NutriAI")
-
-    st.subheader(
-        "Intelligent Multi-Agent Nutrition Agent"
-    )
+    st.subheader("Intelligent Multi-Agent Nutrition Assistant")
 
     st.markdown(
         """
-        NutriAI combines **AI Agents + RAG + Nutrition Analytics**
-        to provide personalized and intelligent nutrition guidance.
-        """
+        <div class="dashboard-card">
+
+        ### 👋 Welcome to NutriAI
+
+        NutriAI helps you understand food, create personalized
+        nutrition plans, track meals and get simple health guidance.
+
+        </div>
+        """,
+        unsafe_allow_html=True
     )
-
-    st.divider()
-
-
-    # ----------------------------------------------
-    # DASHBOARD CARDS
-    # ----------------------------------------------
 
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-
-        st.markdown(
-            """
-            <div class="dashboard-card">
-                <h2>🤖 4</h2>
-                <h4>AI Agents</h4>
-                <p>Multi-Agent System</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.metric("🔎 Nutrition", "Search")
 
     with col2:
-
-        st.markdown(
-            """
-            <div class="dashboard-card">
-                <h2>🔎 Active</h2>
-                <h4>RAG System</h4>
-                <p>Nutrition Knowledge</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.metric("🍽️ Diet", "Personalized")
 
     with col3:
-
-        st.markdown(
-            """
-            <div class="dashboard-card">
-                <h2>🍎 40+</h2>
-                <h4>Food Records</h4>
-                <p>Nutrition Dataset</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.metric("📝 Food Log", "Track")
 
     with col4:
+        st.metric("❤️ Health", "Guidance")
 
-        st.markdown(
-            """
-            <div class="dashboard-card">
-                <h2>🗄️ SQLite</h2>
-                <h4>Database</h4>
-                <p>Meal Tracking</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+    st.markdown("---")
 
+    st.markdown("### 🤖 Our AI Agents")
 
-    # ----------------------------------------------
-    # MULTI AGENT SYSTEM
-    # ----------------------------------------------
+    c1, c2 = st.columns(2)
 
-    st.markdown("## 🤖 Multi-Agent System")
-
-    agent1, agent2 = st.columns(2)
-
-    with agent1:
+    with c1:
 
         st.markdown(
             """
             <div class="agent-card">
-                <h3>🔎 Nutrition Knowledge Agent</h3>
-                <p>
-                    Retrieves nutrition information from the
-                    knowledge base using RAG.
-                </p>
-                <b>Status: 🟢 Active</b>
+
+            ### 🔎 Nutrition Agent
+
+            Search food information and understand
+            calories, protein, carbohydrates, fats,
+            vitamins and minerals.
+
             </div>
             """,
             unsafe_allow_html=True
@@ -587,28 +400,29 @@ if page == "🏠 Dashboard":
         st.markdown(
             """
             <div class="agent-card">
-                <h3>❤️ Health Advisory Agent</h3>
-                <p>
-                    Provides preventive nutrition guidance for
-                    different health conditions.
-                </p>
-                <b>Status: 🟢 Active</b>
+
+            ### 🍽️ Diet Recommendation Agent
+
+            Creates a personalized nutrition plan
+            based on your body details, activity level
+            and goals.
+
             </div>
             """,
             unsafe_allow_html=True
         )
 
-    with agent2:
+    with c2:
 
         st.markdown(
             """
             <div class="agent-card">
-                <h3>🍱 Diet Recommendation Agent</h3>
-                <p>
-                    Creates personalized diet recommendations
-                    based on user profile and fitness goals.
-                </p>
-                <b>Status: 🟢 Active</b>
+
+            ### 📝 Food Log Agent
+
+            Record your meals and track your
+            nutrition history.
+
             </div>
             """,
             unsafe_allow_html=True
@@ -617,565 +431,402 @@ if page == "🏠 Dashboard":
         st.markdown(
             """
             <div class="agent-card">
-                <h3>📝 Food Log & Feedback Agent</h3>
-                <p>
-                    Analyzes logged meals and calculates
-                    nutritional intake.
-                </p>
-                <b>Status: 🟢 Active</b>
+
+            ### ❤️ Health Advisory Agent
+
+            Get simple nutrition guidance for
+            common health conditions.
+
             </div>
             """,
             unsafe_allow_html=True
         )
 
 
-    # ----------------------------------------------
-    # NUTRITION OVERVIEW
-    # ----------------------------------------------
-
-    st.markdown("## 📊 Nutrition Overview")
-
-    macro_data = pd.DataFrame(
-        {
-            "Nutrient": [
-                "Protein",
-                "Carbohydrates",
-                "Fat"
-            ],
-            "Percentage": [
-                25,
-                45,
-                30
-            ]
-        }
-    )
-
-    fig = px.pie(
-        macro_data,
-        names="Nutrient",
-        values="Percentage",
-        title="Recommended Macro Distribution"
-    )
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True
-    )
-
-    st.info(
-        "💡 NutriAI provides educational nutrition guidance "
-        "and should not replace professional medical advice."
-    )
-
-
-# ==================================================
+# =========================================================
 # NUTRITION KNOWLEDGE
-# ==================================================
+# =========================================================
 
 elif page == "🔎 Nutrition Knowledge":
 
-    st.title("🔎 Nutrition Knowledge Agent")
+    st.title("🔎 Nutrition Knowledge")
 
     st.write(
-        "Search the nutrition knowledge base using natural language."
+        "Search for a food to see its nutrition information."
     )
 
     query = st.text_input(
-        "Enter a food or nutrition query",
-        placeholder="Example: chicken, rice, high protein foods, vitamin C foods"
+        "What food or nutrition information are you looking for?",
+        placeholder="Example: chicken, rice, apple..."
     )
 
-    top_k = st.slider(
-        "Number of results",
-        min_value=1,
-        max_value=10,
-        value=5
-    )
+    if st.button("🔍 Search"):
 
-    if st.button("🔍 Search Nutrition Data"):
+        if not query.strip():
 
-        if query.strip() == "":
-
-            st.warning(
-                "Please enter a search query."
-            )
+            st.warning("Please enter a food name.")
 
         else:
 
-            results = nutrition_agent.find_food(
-                query
-            )
+            try:
 
-            if len(results) == 0:
+                result = nutrition_agent.find_food(query)
 
-                st.error(
-                    "No nutrition information found."
-                )
+                if result is None:
 
-            else:
-
-                st.success(
-                    f"Found {len(results)} nutrition records."
-                )
-
-
-                # --------------------------------------
-                # BASIC NUTRITION
-                # --------------------------------------
-
-                display_columns = [
-                    "Food",
-                    "Category",
-                    "Serving",
-                    "Calories",
-                    "Protein",
-                    "Carbohydrates",
-                    "Fat",
-                    "Fiber",
-                    "Sugar"
-                ]
-
-
-                # --------------------------------------
-                # VITAMINS
-                # --------------------------------------
-
-                vitamin_columns = [
-                    "Vitamin A",
-                    "Vitamin B1",
-                    "Vitamin B2",
-                    "Vitamin B3",
-                    "Vitamin B6",
-                    "Vitamin B12",
-                    "Vitamin C",
-                    "Vitamin D",
-                    "Vitamin E",
-                    "Vitamin K"
-                ]
-
-
-                available_columns = [
-                    column
-                    for column in display_columns
-                    if column in results.columns
-                ]
-
-                available_vitamins = [
-                    column
-                    for column in vitamin_columns
-                    if column in results.columns
-                ]
-
-                available_columns.extend(
-                    available_vitamins
-                )
-
-
-                # --------------------------------------
-                # RESULTS
-                # --------------------------------------
-
-                st.dataframe(
-                    results[available_columns],
-                    use_container_width=True,
-                    hide_index=True
-                )
-
-
-                # --------------------------------------
-                # VITAMIN INFORMATION
-                # --------------------------------------
-
-                if available_vitamins:
-
-                    st.markdown(
-                        "## 💊 Vitamin Information"
-                    )
-
-                    st.info(
-                        "Vitamin information retrieved from "
-                        "the nutrition knowledge base."
-                    )
-
-                    vitamin_data = results[
-                        ["Food"] + available_vitamins
-                    ]
-
-                    st.dataframe(
-                        vitamin_data,
-                        use_container_width=True,
-                        hide_index=True
-                    )
+                    st.warning("No nutrition information found.")
 
                 else:
 
-                    st.warning(
-                        "No vitamin columns were found in "
-                        "your current nutrition dataset."
-                    )
+                    st.session_state.food_result = result
+
+            except Exception as e:
+
+                st.error(f"Unable to search nutrition data: {e}")
+
+    if st.session_state.food_result is not None:
+
+        result = st.session_state.food_result
+
+        st.markdown("---")
+        st.subheader("🥗 Nutrition Information")
+
+        if isinstance(result, pd.DataFrame):
+
+            st.dataframe(
+                result,
+                use_container_width=True
+            )
+
+        elif isinstance(result, dict):
+
+            for key, value in result.items():
+
+                st.write(f"**{key}:** {value}")
+
+        else:
+
+            st.write(result)
 
 
-# ==================================================
+# =========================================================
 # DIET RECOMMENDATION
-# ==================================================
+# =========================================================
 
-elif page == "🍱 Diet Recommendation":
+elif page == "🍽️ Diet Recommendation":
 
-    st.title("🍱 Diet Recommendation Agent")
+    st.title("🍽️ Personalized Diet Recommendation")
 
     st.write(
-        "Generate a personalized educational diet recommendation."
+        "Tell us a little about yourself and we'll create a simple nutrition plan for you."
     )
-
-    st.divider()
-
-
-    # ----------------------------------------------
-    # USER PROFILE
-    # ----------------------------------------------
 
     col1, col2 = st.columns(2)
 
     with col1:
 
-        name = st.text_input(
-            "Name",
-            placeholder="Enter your name"
-        )
-
         age = st.number_input(
             "Age",
             min_value=1,
-            max_value=100,
+            max_value=120,
             value=20
         )
 
         gender = st.selectbox(
             "Gender",
             [
-                "Female",
-                "Male"
+                "Male",
+                "Female"
             ]
         )
 
         weight = st.number_input(
             "Weight (kg)",
-            min_value=20.0,
-            max_value=200.0,
+            min_value=1.0,
+            max_value=300.0,
             value=60.0
         )
 
         height = st.number_input(
             "Height (cm)",
-            min_value=100.0,
-            max_value=220.0,
+            min_value=50.0,
+            max_value=250.0,
             value=165.0
         )
 
-
     with col2:
 
-        activity_level = st.selectbox(
-            "Activity Level",
-            [
+        # -------------------------------------------------
+        # FRIENDLY ACTIVITY LEVELS
+        # -------------------------------------------------
+
+        activity_options = {
+
+            "🪑 Mostly sitting — little or no exercise":
                 "Sedentary",
+
+            "🚶 Lightly active — exercise 1–3 days/week":
                 "Light",
+
+            "🏃 Moderately active — exercise 3–5 days/week":
                 "Moderate",
+
+            "🏋️ Very active — exercise 6–7 days/week":
                 "Active"
-            ]
+        }
+
+        activity_label = st.selectbox(
+            "How active are you?",
+            list(activity_options.keys())
         )
 
+        activity_level = activity_options[activity_label]
+
+        # -------------------------------------------------
+
         goal = st.selectbox(
-            "Fitness Goal",
+            "What is your main goal?",
             [
                 "Weight Loss",
-                "Weight Maintenance",
-                "Weight Gain"
+                "Weight Gain",
+                "Maintain Weight",
+                "Build Muscle"
             ]
         )
 
         diet_type = st.selectbox(
-            "Diet Type",
+            "What type of food do you prefer?",
             [
                 "Vegetarian",
-                "Non-Vegetarian"
+                "Non-Vegetarian",
+                "Vegan"
             ]
         )
-
-
-        # ------------------------------------------
-        # CULTURAL PREFERENCE
-        # ------------------------------------------
 
         cultural_preference = st.selectbox(
-            "Cultural Food Preference",
+            "What type of cuisine do you prefer?",
             [
-                "Any",
                 "Indian",
-                "Mediterranean",
-                "Asian",
-                "Western"
+                "South Indian",
+                "North Indian",
+                "Western",
+                "Any"
             ]
         )
 
+    st.markdown("---")
 
-        health_condition = st.text_input(
-            "Health Condition",
-            placeholder="Example: diabetes, heart health, healthy"
-        )
+    if st.button("🍽️ Generate My Diet Plan"):
 
-        allergies = st.text_input(
-            "Food Allergies",
-            placeholder="Example: peanuts, milk"
-        )
+        try:
 
-
-    st.divider()
-
-
-    # ----------------------------------------------
-    # GENERATE PLAN
-    # ----------------------------------------------
-
-    if st.button(
-        "✨ Generate Personalized Plan"
-    ):
-
-        plan = diet_agent.generate_plan(
-            age,
-            gender,
-            weight,
-            height,
-            activity_level,
-            goal,
-            diet_type,
-            cultural_preference
-        )
-
-        st.success(
-            "Personalized nutrition recommendation generated!"
-        )
-
-
-        # ------------------------------------------
-        # HEALTH METRICS
-        # ------------------------------------------
-
-        st.markdown(
-            "## 📊 Your Health Metrics"
-        )
-
-        c1, c2, c3, c4 = st.columns(4)
-
-        with c1:
-
-            st.metric(
-                "BMI",
-                plan["BMI"]
+            result = diet_agent.generate_plan(
+                age=age,
+                gender=gender,
+                weight=weight,
+                height=height,
+                activity_level=activity_level,
+                goal=goal,
+                diet_type=diet_type,
+                cultural_preference=cultural_preference
             )
 
-        with c2:
+            st.success("Your personalized nutrition plan is ready!")
 
-            st.metric(
-                "BMI Category",
-                plan["BMI Category"]
+            # -------------------------------------------------
+            # BMI
+            # -------------------------------------------------
+
+            if isinstance(result, dict):
+
+                if "bmi" in result:
+
+                    st.subheader("📊 Your Body Information")
+
+                    c1, c2, c3 = st.columns(3)
+
+                    with c1:
+                        st.metric(
+                            "BMI",
+                            result.get("bmi")
+                        )
+
+                    with c2:
+                        st.metric(
+                            "BMR",
+                            result.get("bmr", "N/A")
+                        )
+
+                    with c3:
+                        st.metric(
+                            "Daily Calories",
+                            result.get(
+                                "daily_calories",
+                                result.get("calories", "N/A")
+                            )
+                        )
+
+                # -------------------------------------------------
+                # MACROS
+                # -------------------------------------------------
+
+                if "macros" in result:
+
+                    st.subheader("🥗 Daily Macronutrients")
+
+                    macros = result["macros"]
+
+                    if isinstance(macros, dict):
+
+                        c1, c2, c3 = st.columns(3)
+
+                        with c1:
+                            st.metric(
+                                "Protein",
+                                f"{macros.get('protein', 0)} g"
+                            )
+
+                        with c2:
+                            st.metric(
+                                "Carbohydrates",
+                                f"{macros.get('carbs', 0)} g"
+                            )
+
+                        with c3:
+                            st.metric(
+                                "Fat",
+                                f"{macros.get('fat', 0)} g"
+                            )
+
+                # -------------------------------------------------
+                # MEAL PLAN
+                # -------------------------------------------------
+
+                if "meal_plan" in result:
+
+                    st.subheader("🍱 Meal Plan")
+
+                    meal_plan = result["meal_plan"]
+
+                    if isinstance(meal_plan, dict):
+
+                        for meal, foods in meal_plan.items():
+
+                            st.markdown(f"### 🍴 {meal}")
+
+                            if isinstance(foods, list):
+
+                                for food in foods:
+                                    st.write(f"• {food}")
+
+                            else:
+                                st.write(foods)
+
+                    else:
+
+                        st.write(meal_plan)
+
+                # -------------------------------------------------
+                # HEALTH ADVICE
+                # -------------------------------------------------
+
+                if "health_advice" in result:
+
+                    st.subheader("❤️ Health Advice")
+
+                    st.write(
+                        result["health_advice"]
+                    )
+
+                # -------------------------------------------------
+                # ALLERGY WARNING
+                # -------------------------------------------------
+
+                if "allergy_warning" in result:
+
+                    st.warning(
+                        result["allergy_warning"]
+                    )
+
+                # -------------------------------------------------
+                # DISPLAY OTHER RESULTS
+                # -------------------------------------------------
+
+                for key, value in result.items():
+
+                    if key not in [
+                        "bmi",
+                        "bmr",
+                        "daily_calories",
+                        "calories",
+                        "macros",
+                        "meal_plan",
+                        "health_advice",
+                        "allergy_warning"
+                    ]:
+
+                        if value:
+
+                            st.markdown(
+                                f"### {key.replace('_', ' ').title()}"
+                            )
+
+                            st.write(value)
+
+            else:
+
+                st.write(result)
+
+        except Exception as e:
+
+            st.error(
+                f"Unable to generate diet plan: {e}"
             )
 
-        with c3:
 
-            st.metric(
-                "BMR",
-                f'{plan["BMR"]} kcal'
-            )
-
-        with c4:
-
-            st.metric(
-                "Daily Calories",
-                f'{plan["Daily Calories"]} kcal'
-            )
-
-
-        # ------------------------------------------
-        # MACROS
-        # ------------------------------------------
-
-        st.markdown(
-            "## 🥗 Recommended Macros"
-        )
-
-        m1, m2, m3 = st.columns(3)
-
-        with m1:
-
-            st.metric(
-                "Protein",
-                f'{plan["Protein"]} g'
-            )
-
-        with m2:
-
-            st.metric(
-                "Carbohydrates",
-                f'{plan["Carbohydrates"]} g'
-            )
-
-        with m3:
-
-            st.metric(
-                "Fat",
-                f'{plan["Fat"]} g'
-            )
-
-
-        # ------------------------------------------
-        # CULTURAL PREFERENCE
-        # ------------------------------------------
-
-        st.markdown(
-            "## 🌍 Selected Food Culture"
-        )
-
-        st.info(
-            f"Food Preference: {plan['Cultural Preference']}"
-        )
-
-
-        # ------------------------------------------
-        # MEAL PLAN
-        # ------------------------------------------
-
-        st.markdown(
-            "## 🍽️ Sample Daily Meal Plan"
-        )
-
-        for meal, food in plan["Meals"].items():
-
-            st.markdown(
-                f"""
-                <div class="agent-card">
-                    <h3>{meal}</h3>
-                    <p>{food}</p>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-
-        # ------------------------------------------
-        # HEALTH CONDITION
-        # ------------------------------------------
-
-        if health_condition.strip() != "":
-
-            st.markdown(
-                "## ❤️ Health Advisory"
-            )
-
-            advice = health_agent.get_advice(
-                health_condition
-            )
-
-            st.info(
-                advice["Condition"]
-            )
-
-            for item in advice["Advice"]:
-
-                st.write(
-                    "• " + item
-                )
-
-
-        # ------------------------------------------
-        # ALLERGY WARNING
-        # ------------------------------------------
-
-        if allergies.strip() != "":
-
-            st.warning(
-                f"⚠️ Food allergies provided: {allergies}. "
-                "Always verify ingredients before consuming food."
-            )
-
-        st.caption(
-            "These calculations are educational estimates and "
-            "not medical prescriptions."
-        )
-
-
-# ==================================================
+# =========================================================
 # FOOD LOG
-# ==================================================
+# =========================================================
 
 elif page == "📝 Food Log":
 
-    st.title("📝 Food Log & Feedback Agent")
+    st.title("📝 Food Log")
 
     st.write(
-        "Log your meals using text, image, or voice input "
-        "and get nutritional analysis."
+        "Record what you eat and keep track of your meals."
     )
 
-    st.divider()
-
-
-    # ==================================================
-    # INPUT METHOD
-    # ==================================================
-
-    input_method = st.radio(
-        "Choose how you want to log your meal:",
+    input_type = st.radio(
+        "How would you like to add your meal?",
         [
             "⌨️ Text",
-            "📷 Image",
+            "🖼️ Image",
             "🎤 Voice"
         ],
         horizontal=True
     )
 
+    meal_text = ""
 
-    # ==================================================
-    # TEXT INPUT
-    # ==================================================
+    # ---------------------------------------------------------
+    # TEXT
+    # ---------------------------------------------------------
 
-    if input_method == "⌨️ Text":
+    if input_type == "⌨️ Text":
 
         meal_text = st.text_area(
-            "Enter your meal",
-            placeholder="Example: chicken, rice, spinach",
-            height=120
+            "What did you eat?",
+            placeholder="Example: 2 idlis with sambar and one banana"
         )
 
-        if st.button("🔍 Analyze Meal"):
+    # ---------------------------------------------------------
+    # IMAGE
+    # ---------------------------------------------------------
 
-            if meal_text.strip() == "":
-
-                st.warning(
-                    "Please enter at least one food."
-                )
-
-            else:
-
-                result = food_log_agent.analyze_meal(
-                    meal_text
-                )
-
-                st.session_state.food_result = result
-
-
-    # ==================================================
-    # IMAGE INPUT
-    # ==================================================
-
-    elif input_method == "📷 Image":
-
-        st.info(
-            "Upload a food image for meal logging."
-        )
+    elif input_type == "🖼️ Image":
 
         uploaded_image = st.file_uploader(
-            "Upload food image",
+            "Upload a food image",
             type=[
                 "jpg",
                 "jpeg",
@@ -1183,367 +834,169 @@ elif page == "📝 Food Log":
             ]
         )
 
-        if uploaded_image is not None:
+        if uploaded_image:
 
             st.image(
                 uploaded_image,
-                caption="Uploaded Meal Image",
+                caption="Uploaded Food Image",
                 use_container_width=True
             )
 
-            st.warning(
-                "Automatic food recognition from images "
-                "requires a vision model. For now, enter "
-                "the food names shown in the image."
+            meal_text = st.text_input(
+                "What foods are in the image?"
             )
 
-            image_food_text = st.text_input(
-                "Food names from image",
-                placeholder="Example: rice, chicken, vegetables"
-            )
-
-            if st.button("🔍 Analyze Image Meal"):
-
-                if image_food_text.strip() == "":
-
-                    st.warning(
-                        "Please enter the food names visible "
-                        "in the image."
-                    )
-
-                else:
-
-                    result = food_log_agent.analyze_meal(
-                        image_food_text
-                    )
-
-                    st.session_state.food_result = result
-
-
-    # ==================================================
-    # VOICE INPUT
-    # ==================================================
-
-    elif input_method == "🎤 Voice":
-
-        st.info(
-            "Upload a voice recording describing "
-            "the foods you ate."
-        )
-
-        audio_file = st.file_uploader(
-            "Upload voice recording",
-            type=[
-                "wav",
-                "mp3",
-                "m4a",
-                "ogg"
-            ]
-        )
-
-        st.caption(
-            "Example: say 'chicken, rice and spinach'."
-        )
-
-        voice_text = st.text_input(
-            "Voice transcription",
-            placeholder="Enter the transcribed food names here"
-        )
-
-        if st.button("🎤 Analyze Voice Meal"):
-
-            if voice_text.strip() == "":
-
-                st.warning(
-                    "Please provide the transcribed food names."
-                )
-
-            else:
-
-                result = food_log_agent.analyze_voice_text(
-                    voice_text
-                )
-
-                st.session_state.food_result = result
-
-
-    # ==================================================
-    # DISPLAY FOOD RESULT
-    # ==================================================
-
-    if st.session_state.food_result is not None:
-
-        result = st.session_state.food_result
-
-        st.divider()
-
-
-        # ----------------------------------------------
-        # FOODS DETECTED
-        # ----------------------------------------------
-
-        st.markdown(
-            "## 🍽️ Foods Detected"
-        )
-
-        if result["Foods"]:
-
-            for food in result["Foods"]:
-
-                st.write(
-                    "• " + str(food)
-                )
-
-        else:
-
-            st.warning(
-                "No matching foods were found."
-            )
-
-        # Show foods that were entered but could not be matched
-        # instead of silently replacing them with unrelated foods.
-        if result.get("Unrecognized Foods"):
-
-            st.warning(
-                "⚠️ Could not confidently identify these foods:"
-            )
-
-            for food in result["Unrecognized Foods"]:
-
-                st.write(
-                    "• " + str(food)
-                )
-
-            st.caption(
-                "Try using a more specific food name or a food "
-                "that exists in the nutrition database."
-            )
-
-
-        # ----------------------------------------------
-        # NUTRITION ANALYSIS
-        # ----------------------------------------------
-
-        st.markdown(
-            "## 📊 Nutritional Analysis"
-        )
-
-        c1, c2, c3, c4, c5 = st.columns(5)
-
-        with c1:
-
-            st.metric(
-                "Calories",
-                f'{result["Calories"]} kcal'
-            )
-
-        with c2:
-
-            st.metric(
-                "Protein",
-                f'{result["Protein"]} g'
-            )
-
-        with c3:
-
-            st.metric(
-                "Carbs",
-                f'{result["Carbohydrates"]} g'
-            )
-
-        with c4:
-
-            st.metric(
-                "Fat",
-                f'{result["Fat"]} g'
-            )
-
-        with c5:
-
-            st.metric(
-                "Fiber",
-                f'{result["Fiber"]} g'
-            )
-
-
-        # ----------------------------------------------
-        # USER FEEDBACK
-        # ----------------------------------------------
-
-        st.divider()
-
-        st.markdown("## ⭐ User Feedback")
-
-        st.write(
-            "Your feedback helps improve the NutriAI nutrition experience."
-        )
-
-        feedback_meal = ", ".join(result["Foods"])
-
-        rating = st.slider(
-            "How helpful was this nutrition analysis?",
-            min_value=1,
-            max_value=5,
-            value=5,
-            step=1,
-            format="%d / 5"
-        )
-
-        rating_labels = {
-            1: "😞 Very Poor",
-            2: "🙁 Poor",
-            3: "😐 Average",
-            4: "🙂 Good",
-            5: "🤩 Excellent"
-        }
-
-        st.write(f"**Your rating:** {rating_labels[rating]}")
-
-        feedback_text = st.text_area(
-            "What did you think? (Optional)",
-            placeholder="Tell us what you liked or what we can improve...",
-            height=120,
-            key="meal_feedback_text"
-        )
-
-        if st.button("📤 Submit Feedback", type="primary"):
-
-            save_user_feedback(
-                feedback_meal,
-                rating,
-                feedback_text.strip()
-            )
-
-            st.success(
-                "✅ Thank you! Your feedback has been submitted successfully."
-            )
-
-            st.session_state.feedback_submitted = True
-
-        if st.session_state.get("feedback_submitted", False):
-            st.caption(
-                "Your feedback has been recorded. Thank you for helping us improve NutriAI!"
-            )
-
-
-        # ----------------------------------------------
-        # SAVE MEAL
-        # ----------------------------------------------
-
-        if result["Foods"]:
-
-            if st.button(
-                "💾 Save Meal to Database"
-            ):
-
-                save_meal(
-                    ", ".join(result["Foods"]),
-                    result["Calories"],
-                    result["Protein"],
-                    result["Carbohydrates"],
-                    result["Fat"],
-                    result["Fiber"]
-                )
-
-                st.success(
-                    "Meal saved successfully to SQLite database!"
-                )
-
-
-    st.divider()
-
-
-    # ==================================================
-    # MEAL HISTORY
-    # ==================================================
-
-    st.markdown(
-        "## 📚 Meal History"
-    )
-
-    logs = get_meal_logs()
-
-    if logs:
-
-        log_data = pd.DataFrame(
-            logs,
-            columns=[
-                "ID",
-                "Food",
-                "Calories",
-                "Protein",
-                "Carbohydrates",
-                "Fat",
-                "Fiber",
-                "Logged At"
-            ]
-        )
-
-        st.dataframe(
-            log_data,
-            use_container_width=True,
-            hide_index=True
-        )
-
-
-        # ----------------------------------------------
-        # HISTORY CHART
-        # ----------------------------------------------
-
-        st.markdown(
-            "## 📈 Meal Calorie History"
-        )
-
-        chart_data = log_data.copy()
-
-        chart_data["Meal"] = (
-            chart_data["Food"]
-            .astype(str)
-            .str[:30]
-        )
-
-        fig = px.bar(
-            chart_data,
-            x="Meal",
-            y="Calories",
-            title="Calories per Logged Meal"
-        )
-
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
+    # ---------------------------------------------------------
+    # VOICE
+    # ---------------------------------------------------------
 
     else:
 
         st.info(
-            "No meals have been logged yet."
+            "Voice input can be connected to a speech-to-text service."
+        )
+
+        meal_text = st.text_input(
+            "Enter what you said"
+        )
+
+    st.markdown("---")
+
+    if st.button("🔍 Analyze Meal"):
+
+        if not meal_text.strip():
+
+            st.warning(
+                "Please enter your meal details."
+            )
+
+        else:
+
+            try:
+
+                result = food_log_agent.analyze_meal(
+                    meal_text
+                )
+
+                st.success(
+                    "Meal analyzed successfully!"
+                )
+
+                if isinstance(result, dict):
+
+                    for key, value in result.items():
+
+                        st.markdown(
+                            f"### {key.replace('_', ' ').title()}"
+                        )
+
+                        st.write(value)
+
+                else:
+
+                    st.write(result)
+
+            except Exception as e:
+
+                st.error(
+                    f"Unable to analyze meal: {e}"
+                )
+
+    # ---------------------------------------------------------
+    # SAVE MEAL
+    # ---------------------------------------------------------
+
+    if meal_text.strip():
+
+        st.markdown("---")
+
+        if st.button("💾 Save Meal"):
+
+            try:
+
+                save_meal(
+                    meal_text
+                )
+
+                st.success(
+                    "Meal saved successfully!"
+                )
+
+            except Exception as e:
+
+                st.error(
+                    f"Unable to save meal: {e}"
+                )
+
+    # ---------------------------------------------------------
+    # MEAL HISTORY
+    # ---------------------------------------------------------
+
+    st.markdown("---")
+
+    st.subheader("📈 Meal History")
+
+    try:
+
+        logs = get_meal_logs()
+
+        if logs:
+
+            df_logs = pd.DataFrame(logs)
+
+            st.dataframe(
+                df_logs,
+                use_container_width=True
+            )
+
+            # Try to create chart when suitable numeric data exists
+
+            numeric_columns = df_logs.select_dtypes(
+                include="number"
+            ).columns.tolist()
+
+            if numeric_columns:
+
+                y_column = numeric_columns[0]
+
+                fig = px.line(
+                    df_logs,
+                    y=y_column,
+                    title="Nutrition History"
+                )
+
+                st.plotly_chart(
+                    fig,
+                    use_container_width=True
+                )
+
+        else:
+
+            st.info(
+                "No meal history available yet."
+            )
+
+    except Exception as e:
+
+        st.info(
+            "Meal history is not available yet."
         )
 
 
-
-
-# ==================================================
+# =========================================================
 # HEALTH ADVISORY
-# ==================================================
+# =========================================================
 
 elif page == "❤️ Health Advisory":
 
-    st.title("❤️ Health Advisory Agent")
+    st.title("❤️ Health Advisory")
 
     st.write(
-        "Get general nutrition guidance based on a health condition."
+        "Get simple nutrition guidance based on your health needs."
     )
 
-    st.divider()
-
-
-    # ----------------------------------------------
-    # HEALTH CONDITIONS
-    # ----------------------------------------------
-
     condition = st.selectbox(
-        "Select health condition",
+        "What would you like nutrition guidance for?",
         [
             "Healthy",
             "Diabetes",
@@ -1557,191 +1010,197 @@ elif page == "❤️ Health Advisory":
         ]
     )
 
+    question = st.text_area(
+        "Tell us what you would like to know",
+        placeholder="Example: What foods should I include in my diet?"
+    )
 
-    # ----------------------------------------------
-    # GET ADVICE
-    # ----------------------------------------------
+    if st.button("❤️ Get Health Advice"):
 
-    if st.button(
-        "❤️ Get Health Advice"
-    ):
+        if not question.strip():
 
-        advice = health_agent.get_advice(
-            condition
-        )
-
-        st.success(
-            advice["Condition"]
-        )
-
-        for item in advice["Advice"]:
-
-            st.markdown(
-                f"""
-                <div class="agent-card">
-                    <p>✅ {item}</p>
-                </div>
-                """,
-                unsafe_allow_html=True
+            question = (
+                f"Give general nutrition guidance for {condition}"
             )
 
-        st.warning(
-            "⚠️ This is general educational nutrition guidance. "
-            "For medical conditions, consult a qualified healthcare professional."
-        )
+        try:
 
-# ==================================================
-# OWNER / ADMIN DASHBOARD
-# ==================================================
+            result = health_agent.get_advice(
+                condition,
+                question
+            )
+
+            st.success(
+                "Health guidance generated."
+            )
+
+            if isinstance(result, dict):
+
+                for key, value in result.items():
+
+                    st.markdown(
+                        f"### {key.replace('_', ' ').title()}"
+                    )
+
+                    st.write(value)
+
+            else:
+
+                st.write(result)
+
+            st.info(
+                "⚠️ This information is for general educational purposes "
+                "and is not a substitute for professional medical advice."
+            )
+
+        except Exception as e:
+
+            st.error(
+                f"Unable to generate health advice: {e}"
+            )
+
+
+# =========================================================
+# OWNER / ADMIN
+# =========================================================
 
 elif page == "🔐 Owner / Admin":
 
-    st.title("🔐 Owner / Admin Dashboard")
-    st.write("Private dashboard for viewing NutriAI user feedback.")
+    st.title("🔐 Owner / Admin")
 
-    ADMIN_PASSWORD = os.getenv("NUTRIAI_ADMIN_PASSWORD", "admin123")
+    st.write(
+        "This section is available only to the project owner."
+    )
 
-    if "admin_logged_in" not in st.session_state:
-        st.session_state.admin_logged_in = False
+    password = st.text_input(
+        "Admin Password",
+        type="password"
+    )
 
-    if not st.session_state.admin_logged_in:
+    admin_password = os.getenv(
+        "NUTRIAI_ADMIN_PASSWORD",
+        "admin123"
+    )
 
-        st.markdown("### Owner Login")
+    if st.button("🔓 Login"):
 
-        admin_password = st.text_input(
-            "Enter owner password",
-            type="password",
-            placeholder="Owner password"
-        )
+        if hmac.compare_digest(
+            password,
+            admin_password
+        ):
 
-        if st.button("🔓 Login", type="primary"):
-            if hmac.compare_digest(admin_password, ADMIN_PASSWORD):
-                st.session_state.admin_logged_in = True
-                st.rerun()
-            else:
-                st.error("❌ Incorrect owner password.")
-
-        st.info("Only the owner/admin should use this section.")
-
-    else:
-
-        top1, top2 = st.columns([6, 1])
-
-        with top1:
-            st.success("✅ Owner authenticated")
-
-        with top2:
-            if st.button("Logout"):
-                st.session_state.admin_logged_in = False
-                st.rerun()
-
-        st.divider()
-
-        feedback_rows = get_user_feedback()
-
-        if feedback_rows:
-
-            feedback_data = pd.DataFrame(
-                feedback_rows,
-                columns=[
-                    "ID",
-                    "Meal",
-                    "Rating",
-                    "Feedback",
-                    "Submitted At"
-                ]
+            st.success(
+                "Admin access granted."
             )
 
-            avg_rating = feedback_data["Rating"].mean()
-            total_feedback = len(feedback_data)
-            five_star = int((feedback_data["Rating"] == 5).sum())
+            st.markdown("---")
 
-            c1, c2, c3 = st.columns(3)
+            st.subheader("📊 User Feedback")
 
-            with c1:
-                st.metric(
-                    "⭐ Average Rating",
-                    f"{avg_rating:.1f} / 5"
+            try:
+
+                conn = sqlite3.connect(
+                    FEEDBACK_DB
                 )
 
-            with c2:
-                st.metric(
-                    "📊 Total Feedback",
-                    total_feedback
+                feedback_df = pd.read_sql_query(
+                    "SELECT * FROM feedback",
+                    conn
                 )
 
-            with c3:
-                st.metric(
-                    "🤩 5-Star Responses",
-                    five_star
+                conn.close()
+
+                if not feedback_df.empty:
+
+                    st.dataframe(
+                        feedback_df,
+                        use_container_width=True
+                    )
+
+                else:
+
+                    st.info(
+                        "No feedback available."
+                    )
+
+            except Exception:
+
+                st.info(
+                    "No feedback table available."
                 )
 
-            st.divider()
+            st.markdown("---")
 
-            st.markdown("## 💬 All User Feedback")
+            st.subheader("📁 Nutrition Dataset")
 
-            selected_rating = st.selectbox(
-                "Filter by rating",
-                ["All", 1, 2, 3, 4, 5]
-            )
+            try:
 
-            filtered_data = feedback_data.copy()
+                if os.path.exists(
+                    "nutrition_data.csv"
+                ):
 
-            if selected_rating != "All":
-                filtered_data = filtered_data[
-                    filtered_data["Rating"] == selected_rating
-                ]
+                    nutrition_df = pd.read_csv(
+                        "nutrition_data.csv"
+                    )
 
-            st.dataframe(
-                filtered_data,
-                use_container_width=True,
-                hide_index=True
-            )
+                    st.dataframe(
+                        nutrition_df,
+                        use_container_width=True
+                    )
 
-            csv_data = filtered_data.to_csv(index=False).encode("utf-8")
+                    csv_data = nutrition_df.to_csv(
+                        index=False
+                    )
 
-            st.download_button(
-                "📥 Download Feedback CSV",
-                data=csv_data,
-                file_name="nutriai_user_feedback.csv",
-                mime="text/csv"
-            )
+                    st.download_button(
+                        "⬇️ Download Nutrition Data",
+                        csv_data,
+                        "nutrition_data.csv",
+                        "text/csv"
+                    )
 
-            st.divider()
+                else:
 
-            st.markdown("## 📈 Rating Distribution")
+                    st.warning(
+                        "nutrition_data.csv not found."
+                    )
 
-            rating_counts = (
-                feedback_data["Rating"]
-                .value_counts()
-                .reindex([1, 2, 3, 4, 5], fill_value=0)
-                .reset_index()
-            )
+            except Exception as e:
 
-            rating_counts.columns = ["Rating", "Responses"]
-
-            fig = px.bar(
-                rating_counts,
-                x="Rating",
-                y="Responses",
-                title="User Feedback Ratings"
-            )
-
-            st.plotly_chart(
-                fig,
-                use_container_width=True
-            )
+                st.error(
+                    f"Unable to load dataset: {e}"
+                )
 
         else:
-            st.info("No user feedback has been submitted yet.")
 
-# ==================================================
+            if password:
+
+                st.error(
+                    "Incorrect password."
+                )
+
+
+# =========================================================
 # FOOTER
-# ==================================================
+# =========================================================
 
 st.markdown("---")
 
-st.caption(
-    "🥗 NutriAI — Intelligent Multi-Agent Nutrition Agent | "
-    "RAG + AI Agents + SQLite + Analytics"
+st.markdown(
+    """
+    <div style="text-align:center; padding:20px;">
+
+    <h4>🥗 NutriAI</h4>
+
+    <p>
+    Intelligent Multi-Agent Nutrition Assistant
+    </p>
+
+    <p>
+    Eat Better • Live Better • Stay Healthy
+    </p>
+
+    </div>
+    """,
+    unsafe_allow_html=True
 )
