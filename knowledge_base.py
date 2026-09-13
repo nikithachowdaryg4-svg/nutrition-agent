@@ -1,4 +1,4 @@
-from rag.retriever import NutritionRetriever
+from retriever import NutritionRetriever
 
 
 class NutritionKnowledgeBase:
