@@ -4,7 +4,7 @@ import plotly.express as px
 import sqlite3
 import os
 import hmac
-
+from nutrition_agent import NutritionAgent
 from agents.nutrition_agent import NutritionAgent
 from agents.diet_agent import DietRecommendationAgent
 from agents.health_agent import HealthAdvisoryAgent
