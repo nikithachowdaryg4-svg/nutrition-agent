@@ -6,7 +6,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 class NutritionRetriever:
 
-    def __init__(self, data_path="data/nutrition_data.csv"):
+    def __init__(self, data_path="nutrition_data.csv"):
         self.data = pd.read_csv(data_path)
 
         # Create searchable text from each food record
