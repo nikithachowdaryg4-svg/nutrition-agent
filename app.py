@@ -5,7 +5,7 @@ import sqlite3
 import os
 import hmac
 from nutrition_agent import NutritionAgent
-from agents.nutrition_agent import NutritionAgent
+from nutrition_agent import NutritionAgent
 from agents.diet_agent import DietRecommendationAgent
 from agents.health_agent import HealthAdvisoryAgent
 from agents.food_log_agent import FoodLogAgent
