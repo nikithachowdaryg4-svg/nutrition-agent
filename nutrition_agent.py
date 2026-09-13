@@ -1,4 +1,4 @@
-from rag.knowledge_base import NutritionKnowledgeBase
+from knowledge_base import NutritionKnowledgeBase
 
 
 class NutritionAgent:
